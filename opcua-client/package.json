@@ -1,17 +1,5 @@
 {
-  "name": "plant-opcua-controller",
-  "version": "1.0.0",
-  "description": "Modular OPC UA controller generated from flowchart",
-  "main": "src/mainController.js",
-  "scripts": {
-    "start": "node src/mainController.js",
-    "lint": "eslint . || true"
-  },
   "dependencies": {
-    "node-opcua": "^2.85.0",
-    "eventemitter3": "^4.0.7"
-  },
-  "engines": {
-    "node": ">=16"
+    "node-opcua": "^2.157.0"
   }
 }
