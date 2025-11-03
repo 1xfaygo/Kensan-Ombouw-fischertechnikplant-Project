@@ -1,4 +1,4 @@
-import { ClientSession, AttributeIds, DataType } from "node-opcua-client";
+import { ClientSession, AttributeIds, DataType } from "node-opcua";
 
 export class BaseModel {
     protected session: ClientSession;

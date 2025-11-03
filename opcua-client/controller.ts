@@ -1,4 +1,4 @@
-import { OPCUAClient } from "node-opcua-client";
+import { OPCUAClient } from "node-opcua";
 
 async function main() {
     const endpoint = "opc.tcp://localhost:4840/???/???/";
