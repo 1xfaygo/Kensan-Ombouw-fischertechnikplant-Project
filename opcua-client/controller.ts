@@ -1,7 +1,8 @@
 import { OPCUAClient } from "node-opcua";
+import { Crane } from "./models/crane";
 
 async function main() {
-    const endpoint = "opc.tcp://localhost:4840/???/???/";
+    const endpoint = "opc.tcp://localhost:4840/UA/TestServer";
     const client = OPCUAClient.create({ endpointMustExist: false });
 
     try {
@@ -13,6 +14,8 @@ async function main() {
         console.log("Session created");
 
         const ns = 2;
+
+        const crane = new Crane(session, ns)
 
         await session.close();
         console.log("Session closed");

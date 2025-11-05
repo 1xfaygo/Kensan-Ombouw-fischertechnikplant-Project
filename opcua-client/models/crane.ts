@@ -1,13 +1,13 @@
 import { DataType, ClientSession } from "node-opcua";
 import { BaseModel } from "./base";
 
-export class CraneModel extends BaseModel {
+export class Crane extends BaseModel {
     constructor(session: ClientSession, ns: number) {
         super(session, ns, "Crane");
     }
 
-    async getCoords() { return this.read("Coords"); }
-    async setCoords(value: number) { return this.write("Coords", value, DataType.Int16); }
+    async getLocation() { return this.read("Location"); }
+    async setLocation(value: number) { return this.write("Location", value, DataType.Int16); }
 
     async isRunning() { return this.read("Running"); }
     async setRunning(value: boolean) { return this.write("Running", value, DataType.Boolean); }
@@ -16,5 +16,10 @@ export class CraneModel extends BaseModel {
     async stop() {
         await this.setRunning(false);
         console.log("Crane stopped.");
+    }
+
+    async start() {
+        await this.setRunning(true);
+        console.log("Crane started")
     }
 }
