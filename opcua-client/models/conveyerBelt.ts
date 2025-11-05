@@ -9,9 +9,21 @@ export class LoopbandModel extends BaseModel {
     async isRunning() { return this.read("Running"); }
     async setRunning(value: boolean) { return this.write("Running", value, DataType.Boolean); }
 
+    async start() {
+        await this.setRunning(true);
+        console.log("Loopband started.");
+    }
+
+    async checkColor(color: "Red" | "White" | "Blue") {
+        return this.read(`Color${color}`);
+    }
+
+    async moveToPosition(position: number) {
+        await this.write("Position", position, DataType.Int16);
+    }
+
     async pushItem(piston: number) {
         await this.write(`Piston${piston}`, true, DataType.Boolean);
-        await new Promise(r => setTimeout(r, 300));
         await this.write(`Piston${piston}`, false, DataType.Boolean);
     }
 
@@ -20,8 +32,4 @@ export class LoopbandModel extends BaseModel {
         console.log("Loopband stopped.");
     }
 
-    async start() {
-        await this.setRunning(true);
-        console.log("Loopband started.");
-    }
 }
