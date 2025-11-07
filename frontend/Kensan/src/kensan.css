@@ -1,20 +1,17 @@
 /* 
- * ========================================
- * 🎨 KENSAN DESIGN SYSTEM
- * Centraal CSS bestand voor alle styling
- * ========================================
+ * KENSAN DESIGN SYSTEM
+ * Central CSS file for all styling
  */
 
 /* 
- * ========================================
- * 🏗️ LAYOUT COMPONENTS
- * ========================================
+ * LAYOUT COMPONENTS
  */
 
 .kensan-container {
   display: flex;
   min-height: 100vh;
   background-color: var(--color-kensan-gray);
+  transition: background-color 0.4s ease;
 }
 
 .kensan-main-content {
@@ -22,12 +19,11 @@
   display: flex;
   flex-direction: column;
   background-color: var(--color-kensan-gray);
+  transition: background-color 0.4s ease;
 }
 
 /* 
- * ========================================
- * 📱 SIDEBAR
- * ========================================
+ * SIDEBAR
  */
 
 .kensan-sidebar {
@@ -38,6 +34,7 @@
   flex-direction: column;
   min-height: 100vh;
   flex-shrink: 0;
+  transition: background-color 0.4s ease;
 }
 
 .kensan-sidebar-logo {
@@ -47,13 +44,13 @@
 .kensan-sidebar-logo img {
   max-width: 140px;
   height: auto;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.4));
 }
 
 .kensan-divider {
   height: 3px;
   background-color: var(--color-kensan-divider);
   margin: 0.85rem 0;
+  transition: background-color 0.4s ease;
 }
 
 .kensan-sidebar-footer {
@@ -77,18 +74,51 @@
   cursor: pointer;
   border-radius: 999px;
   filter: drop-shadow(0px 5px 10px rgba(0, 0, 0, 0.35));
-  transition: 0.3s;
+  transition: background-color 0.4s ease;
   display: flex;
   align-items: center;
+  overflow: hidden;
 }
 
-.kensan-theme-toggle-icon {
-  color: var(--color-kensan-yellow);
-  font-size: 17px;
+/* Light mode active - black background (moon visible) */
+.kensan-theme-toggle-btn.light {
+  background-color: #171717;
+}
+
+/* The icon that moves and changes */
+.kensan-theme-icon {
   position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  font-size: 18px;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.2s ease;
+}
+
+/* Sunny icon - zichtbaar in dark mode (aan de linkerkant) */
+.kensan-theme-icon.sunny {
+  color: var(--color-kensan-yellow);
+  left: 8px;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Sunny disappears to the right when switching to light mode */
+.kensan-theme-toggle-btn.light .kensan-theme-icon.sunny {
+  opacity: 0;
+  transform: translateX(70px);
+}
+
+/* Dark mode icon - visible in light mode (on the right side) */
+.kensan-theme-icon.dark_mode {
+  color: var(--color-kensan-light_blue);
+  right: 8px;
+  opacity: 0;
+  transform: translateX(-70px);
+}
+
+/* Moon comes from right to left when switching to light mode */
+.kensan-theme-toggle-btn.light .kensan-theme-icon.dark_mode {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .kensan-user-info {
@@ -107,12 +137,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.4s ease;
 }
 
 .kensan-user-icon .material-symbols-outlined {
   font-size: 16px;
   color: var(--color-kensan-white);
   opacity: 0.75;
+  transition: color 0.4s ease;
 }
 
 .kensan-user-status {
@@ -122,12 +154,11 @@
   padding: 5px 14px;
   border-radius: 9px;
   font-size: 11px;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* 
- * ========================================
- * 🔘 MENU ITEMS
- * ========================================
+ * MENU ITEMS
  */
 
 .kensan-menu {
@@ -147,7 +178,6 @@
   position: relative;
   cursor: pointer;
   transition: all 0.2s ease;
-  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 .kensan-menu-item:not(.active):not(.disabled):hover {
@@ -157,11 +187,13 @@
 .kensan-menu-item.active {
   color: var(--color-kensan-white);
   font-weight: 600;
+  transition: color 0.4s ease;
 }
 
 .kensan-menu-item:not(.active) {
   color: var(--color-kensan-light_gray);
   font-weight: 400;
+  transition: color 0.4s ease;
 }
 
 .kensan-menu-item.disabled {
@@ -171,7 +203,7 @@
 
 .kensan-menu-item .material-symbols-outlined {
   font-size: 19px;
-  transition: color 0.15s ease;
+  transition: color 0.4s ease;
 }
 
 .kensan-menu-item.active .material-symbols-outlined {
@@ -199,9 +231,7 @@
 }
 
 /* 
- * ========================================
- * 📄 HEADER
- * ========================================
+ * HEADER
  */
 
 .kensan-header {
@@ -217,19 +247,17 @@
   font-weight: 600;
   color: var(--color-kensan-white);
   margin-bottom: 0.25rem;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.4));
+  transition: color 0.4s ease;
 }
 
 .kensan-header-subtitle {
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   color: var(--color-kensan-light_gray);
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.4));
+  transition: color 0.4s ease;
 }
 
 /* 
- * ========================================
- * 🔌 POWER BUTTON (3 staten)
- * ========================================
+ * POWER BUTTON (3 states)
  */
 
 .kensan-power-btn {
@@ -246,7 +274,7 @@
   transition: all 0.2s;
 }
 
-/* Groen - Systeem AAN */
+/* Green - System ON */
 .kensan-power-btn.power-on {
   border-color: var(--color-kensan-power-on);
   box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-on) r g b / 0.1), 0 0 14px rgb(from var(--color-kensan-power-on) r g b / 0.16);
@@ -256,7 +284,7 @@
   box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-on) r g b / 0.16), 0 0 18px rgb(from var(--color-kensan-power-on) r g b / 0.22);
 }
 
-/* Rood - Systeem UIT */
+/* Red - System OFF */
 .kensan-power-btn.power-off {
   border-color: var(--color-kensan-power-off);
   box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-off) r g b / 0.1), 0 0 14px rgb(from var(--color-kensan-power-off) r g b / 0.16);
@@ -266,7 +294,7 @@
   box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-off) r g b / 0.16), 0 0 18px rgb(from var(--color-kensan-power-off) r g b / 0.22);
 }
 
-/* Blauw - Bezig/Processing */
+/* Blue - Busy/Processing */
 .kensan-power-btn.power-busy {
   border-color: var(--color-kensan-power-busy);
   box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-busy) r g b / 0.1), 0 0 14px rgb(from var(--color-kensan-power-busy) r g b / 0.16);
@@ -279,12 +307,11 @@
 .kensan-power-btn .material-symbols-outlined {
   color: var(--color-kensan-white);
   font-size: 25px;
+  transition: color 0.4s ease;
 }
 
 /* 
- * ========================================
- * 📊 DASHBOARD GRID
- * ========================================
+ * DASHBOARD GRID
  */
 
 .kensan-dashboard-main {
@@ -305,6 +332,7 @@
 .kensan-card {
   background-color: var(--color-kensan-black);
   border-radius: 10px;
+  transition: background-color 0.4s ease;
 }
 
 .kensan-card.top1 { grid-area: top1; min-height: 80px; }
@@ -316,9 +344,7 @@
 .kensan-card.bot2 { grid-area: bot2; min-height: 180px; }
 
 /* 
- * ========================================
- * ✨ ANIMATIONS
- * ========================================
+ * ANIMATIONS
  */
 
 @keyframes fadeIn {
@@ -333,9 +359,7 @@
 }
 
 /* 
- * ========================================
- * 📱 RESPONSIVE
- * ========================================
+ * RESPONSIVE
  */
 
 @media (max-width: 1024px) {

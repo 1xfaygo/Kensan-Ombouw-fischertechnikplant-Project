@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
 /**
- * KENSAN DASHBOARD - Met grid layout zoals in het ExpressJS design
+ * KENSAN DASHBOARD - With grid layout as in the ExpressJS design
  */
 
 function Dashboard() {
@@ -11,7 +11,7 @@ function Dashboard() {
   const [dateString, setDateString] = useState('');
 
   useEffect(() => {
-    // Datum instellen
+    // Set the date
     const months = [
       'january', 'february', 'march', 'april', 'may', 'june',
       'july', 'august', 'september', 'october', 'november', 'december'
@@ -24,10 +24,10 @@ function Dashboard() {
 
   return (
     <div className="kensan-container">
-      {/* SIDEBAR LINKS */}
+      {/* SIDEBAR LEFT */}
       <Sidebar activeItem="dashboard" />
 
-      {/* MAIN CONTENT RECHTS */}
+      {/* MAIN CONTENT RIGHT */}
       <div className="kensan-main-content">
         {/* HEADER */}
         <div className="kensan-header">

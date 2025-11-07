@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
 /**
- * 📱 KENSAN SIDEBAR - EXACT ZOALS IN HET EXPRESSJS DESIGN
+ * KENSAN SIDEBAR - EXACTLY AS IN THE EXPRESSJS DESIGN
  * 
- * Verticale sidebar aan de linkerkant met:
- * - Logo bovenaan
- * - Menu items verticaal onder elkaar met witte balk links en rechts als actief
- * - Light mode toggle onderaan
- * - User status helemaal onderaan
+ * Vertical sidebar on the left with:
+ * - Logo at the top
+ * - Menu items stacked vertically with white bar on left and right when active
+ * - Light mode toggle at the bottom
+ * - User status at the very bottom
  */
 
 interface SidebarProps {
@@ -16,10 +16,22 @@ interface SidebarProps {
 
 function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) {
   const [activeItem, setActiveItem] = useState(initialActiveItem);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    // Toggle light-mode class on the root element
+    if (!isDarkMode) {
+      document.documentElement.classList.remove('light-mode');
+    } else {
+      document.documentElement.classList.add('light-mode');
+    }
+    console.log(`Theme switched to: ${!isDarkMode ? 'Light' : 'Dark'} mode`);
+  };
 
   return (
     <div className="kensan-sidebar">
-      {/* LOGO BOVENAAN */}
+      {/* LOGO AT THE TOP */}
       <div style={{ padding: '0 0.5rem 1rem' }}>
         <img 
           src="/logo.png" 
@@ -31,7 +43,7 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
       {/* DIVIDER */}
       <div className="kensan-divider" />
 
-      {/* MENU ITEMS - VERTICAAL */}
+      {/* MENU ITEMS - VERTICAL */}
       <nav className="kensan-menu">
         <MenuItem 
           icon="dashboard"
@@ -67,21 +79,20 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
 
       {/* SIDEBAR FOOTER */}
       <div className="kensan-sidebar-footer">
-        {/* LIGHT MODE TOGGLE */}
+        {/* THEME TOGGLE */}
         <div style={{ padding: '0.35rem 0.6rem' }}>
-          <button className="kensan-theme-toggle-btn">
-            <span 
-              className="material-symbols-outlined"
-              style={{ 
-                color: '#FFD325', 
-                fontSize: '17px',
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)'
-              }}
-            >
+          <button 
+            className={`kensan-theme-toggle-btn ${!isDarkMode ? 'light' : ''}`}
+            onClick={toggleTheme}
+          >
+            {/* Sunny icon - visible in DARK mode (left) */}
+            <span className="material-symbols-outlined kensan-theme-icon sunny">
               sunny
+            </span>
+            
+            {/* Dark mode icon - visible in LIGHT mode (right) */}
+            <span className="material-symbols-outlined kensan-theme-icon dark_mode">
+              dark_mode
             </span>
           </button>
         </div>
@@ -92,65 +103,20 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
         {/* USER INFO */}
         <div className="kensan-user-info">
           {/* User Icon */}
-          <div 
-            style={{ 
-              width: '26px',
-              height: '26px',
-              borderRadius: '999px',
-              backgroundColor: '#1E1E1E',
-              border: '1px solid rgba(255,255,255,.05)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <span 
-              className="material-symbols-outlined"
-              style={{ 
-                fontSize: '16px', 
-                color: '#fff', 
-                opacity: 0.75 
-              }}
-            >
+          <div className="kensan-user-icon">
+            <span className="material-symbols-outlined">
               person
             </span>
           </div>
 
           {/* "not logged in" text */}
-          <span 
-            style={{ 
-              backgroundColor: '#1E1E1E',
-              border: '1px solid rgba(255,255,255,.05)',
-              color: '#525252',
-              padding: '5px 14px',
-              borderRadius: '9px',
-              fontSize: '11px'
-            }}
-          >
+          <span className="kensan-user-status">
             not logged in
           </span>
 
           {/* Settings icon */}
-          <div 
-            style={{ 
-              width: '26px',
-              height: '26px',
-              borderRadius: '999px',
-              backgroundColor: '#1E1E1E',
-              border: '1px solid rgba(255,255,255,.05)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <span 
-              className="material-symbols-outlined"
-              style={{ 
-                fontSize: '16px', 
-                color: '#fff', 
-                opacity: 0.75 
-              }}
-            >
+          <div className="kensan-user-icon">
+            <span className="material-symbols-outlined">
               settings
             </span>
           </div>
@@ -161,7 +127,7 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
 }
 
 /**
- * MENU ITEM - Met witte balk links en rechts als actief
+ * MENU ITEM - With white bar on left and right when active
  */
 interface MenuItemProps {
   icon: string;
@@ -192,26 +158,14 @@ function MenuItem({ icon, label, isActive = false, disabled = false, onClick }: 
         backgroundColor: (!disabled && !isActive && isHovered) ? 'rgba(255,255,255,0.02)' : undefined
       }}
     >
-      <span 
-        className="material-symbols-outlined"
-        style={{ 
-          fontSize: '19px',
-          color: isActive ? '#fff' : '#525252',
-          transition: 'color 0.15s ease'
-        }}
-      >
+      <span className="material-symbols-outlined">
         {icon}
       </span>
-      <span 
-        style={{ 
-          filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5))',
-          transition: 'color 0.15s ease'
-        }}
-      >
+      <span className="kensan-menu-item-label">
         {label}
       </span>
       
-      {/* Witte balk rechts met fade animatie */}
+      {/* White bar on the right with fade animation */}
       {isActive && (
         <div className="kensan-menu-indicator" />
       )}

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* 
- * 🎨 KENSAN KLEUREN - Custom Tailwind Theme
- * Gebruik: bg-kensan-black, text-kensan-white, border-kensan-light_blue, etc.
+ * KENSAN COLORS - Custom Tailwind Theme
+ * Usage: bg-kensan-black, text-kensan-white, border-kensan-light_blue, etc.
  */
 @theme {
   /* Primary Colors */
@@ -14,7 +14,7 @@
   --color-kensan-light_orange: #F89820;
   --color-kensan-dark_orange: #F2811D;
   
-  /* Base Colors */
+  /* Base Colors - Dark Mode */
   --color-kensan-white: #EEEEEE;
   --color-kensan-black: #171717;
   --color-kensan-gray: #1E1E1E;
@@ -31,16 +31,49 @@
   --color-kensan-off: #A4ABB6;
   
   /* Power Button Colors */
-  --color-kensan-power-on: #32F21D;      /* Groen - systeem aan */
-  --color-kensan-power-off: #F21D1D;     /* Rood - systeem uit */
-  --color-kensan-power-busy: #29AAE2;    /* Blauw - bezig/processing */
+  --color-kensan-power-on: #32F21D;      
+  --color-kensan-power-off: #F21D1D;     
+  --color-kensan-power-busy: #29AAE2;   
   
   /* Additional Variables */
-  --color-kensan-divider: #2A2A2A;       /* Divider lijnen in sidebar */
+  --color-kensan-divider: #2A2A2A;
 }
 
 /* 
- * 📝 RESET - Zorg dat alles netjes werkt
+ * DARK MODE (default)
+ */
+:root {
+  --bg-primary: var(--color-kensan-gray);
+  --bg-secondary: var(--color-kensan-black);
+  --text-primary: var(--color-kensan-white);
+  --text-secondary: var(--color-kensan-light_gray);
+  --divider-color: var(--color-kensan-divider);
+}
+
+/* 
+ * LIGHT MODE
+ */
+:root.light-mode {
+  --bg-primary: #F5F5F5;
+  --bg-secondary: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --divider-color: #E0E0E0;
+  
+  --color-kensan-gray: #F5F5F5;
+  --color-kensan-black: #FFFFFF;
+  --color-kensan-white: #1A1A1A;
+  --color-kensan-light_gray: #666666;
+  --color-kensan-divider: #E0E0E0;
+}
+
+/* Power button icon color in light mode */
+:root.light-mode .kensan-power-btn .material-symbols-outlined {
+  color: var(--color-kensan-light_gray);
+}
+
+/* 
+ * RESET - Ensure everything works properly
  */
 * {
   margin: 0;
@@ -55,7 +88,7 @@ body {
 }
 
 /* 
- * 🎯 GOOGLE ICONS STYLING
+ * GOOGLE ICONS STYLING
  */
 .material-symbols-outlined {
   font-variation-settings:
@@ -67,7 +100,7 @@ body {
 }
 
 /* 
- * ✨ SIDEBAR ANIMATIONS
+ * SIDEBAR ANIMATIONS
  */
 @keyframes fadeIn {
   from {
@@ -81,7 +114,7 @@ body {
 }
 
 /* 
- * 📦 DASHBOARD CARDS
+ * DASHBOARD CARDS
  */
 .card {
   background-color: var(--color-kensan-black);
@@ -89,7 +122,7 @@ body {
 }
 
 /* 
- * 📱 RESPONSIVE DASHBOARD GRID
+ * RESPONSIVE DASHBOARD GRID
  */
 @media (max-width: 1024px) {
   .dashboard-grid {
