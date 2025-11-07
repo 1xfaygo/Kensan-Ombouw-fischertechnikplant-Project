@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* 
+ * 🎨 KENSAN KLEUREN - Custom Tailwind Theme
+ * Gebruik: bg-kensan-black, text-kensan-white, border-kensan-light_blue, etc.
+ */
+@theme {
+  /* Primary Colors */
+  --color-kensan-light_blue: #29AAE2;
+  --color-kensan-dark_blue: #096891;
+  --color-kensan-cyan: #031F2B;
+  --color-kensan-light_green: #1BB14B;
+  --color-kensan-dark_green: #076926;
+  --color-kensan-light_orange: #F89820;
+  --color-kensan-dark_orange: #F2811D;
+  
+  /* Base Colors */
+  --color-kensan-white: #EEEEEE;
+  --color-kensan-black: #171717;
+  --color-kensan-gray: #1E1E1E;
+  --color-kensan-light_gray: #525252;
+  --color-kensan-yellow: #FFD325;
+  --color-kensan-light_yellow: #FFFFD0;
+  
+  /* Status Colors */
+  --color-kensan-critical: #FF3838;
+  --color-kensan-serious: #FFB302;
+  --color-kensan-caution: #FCE83A;
+  --color-kensan-normal: #56F000;
+  --color-kensan-standby: #2DCCFF;
+  --color-kensan-off: #A4ABB6;
+  
+  /* Power Button Colors */
+  --color-kensan-power-on: #32F21D;      /* Groen - systeem aan */
+  --color-kensan-power-off: #F21D1D;     /* Rood - systeem uit */
+  --color-kensan-power-busy: #29AAE2;    /* Blauw - bezig/processing */
+  
+  /* Additional Variables */
+  --color-kensan-divider: #2A2A2A;       /* Divider lijnen in sidebar */
+}
+
+/* 
+ * 📝 RESET - Zorg dat alles netjes werkt
+ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-kensan-gray);
+  color: var(--color-kensan-white);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* 
+ * 🎯 GOOGLE ICONS STYLING
+ */
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24;
+  user-select: none;
+}
+
+/* 
+ * ✨ SIDEBAR ANIMATIONS
+ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scaleY(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1);
+  }
+}
+
+/* 
+ * 📦 DASHBOARD CARDS
+ */
+.card {
+  background-color: var(--color-kensan-black);
+  border-radius: 10px;
+}
+
+/* 
+ * 📱 RESPONSIVE DASHBOARD GRID
+ */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: 
+      "top1"
+      "top2"
+      "top3"
+      "wide"
+      "tall"
+      "bot1"
+      "bot2" !important;
+  }
+}

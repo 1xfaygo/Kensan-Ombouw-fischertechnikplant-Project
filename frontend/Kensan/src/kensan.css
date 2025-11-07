@@ -1,0 +1,353 @@
+/* 
+ * ========================================
+ * 🎨 KENSAN DESIGN SYSTEM
+ * Centraal CSS bestand voor alle styling
+ * ========================================
+ */
+
+/* 
+ * ========================================
+ * 🏗️ LAYOUT COMPONENTS
+ * ========================================
+ */
+
+.kensan-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-kensan-gray);
+}
+
+.kensan-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-kensan-gray);
+}
+
+/* 
+ * ========================================
+ * 📱 SIDEBAR
+ * ========================================
+ */
+
+.kensan-sidebar {
+  width: 220px;
+  background-color: var(--color-kensan-black);
+  padding: 1.25rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  flex-shrink: 0;
+}
+
+.kensan-sidebar-logo {
+  padding: 0 0.5rem;
+}
+
+.kensan-sidebar-logo img {
+  max-width: 140px;
+  height: auto;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.4));
+}
+
+.kensan-divider {
+  height: 3px;
+  background-color: var(--color-kensan-divider);
+  margin: 0.85rem 0;
+}
+
+.kensan-sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding-top: 0.9rem;
+}
+
+.kensan-theme-toggle {
+  padding: 0.35rem 0.6rem;
+}
+
+.kensan-theme-toggle-btn {
+  background-color: var(--color-kensan-light_yellow);
+  height: 30px;
+  width: 90px;
+  position: relative;
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  filter: drop-shadow(0px 5px 10px rgba(0, 0, 0, 0.35));
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.kensan-theme-toggle-icon {
+  color: var(--color-kensan-yellow);
+  font-size: 17px;
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.kensan-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.6rem;
+}
+
+.kensan-user-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background-color: var(--color-kensan-gray);
+  border: 1px solid rgba(255,255,255,.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kensan-user-icon .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--color-kensan-white);
+  opacity: 0.75;
+}
+
+.kensan-user-status {
+  background-color: var(--color-kensan-gray);
+  border: 1px solid rgba(255,255,255,.05);
+  color: var(--color-kensan-light_gray);
+  padding: 5px 14px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+
+/* 
+ * ========================================
+ * 🔘 MENU ITEMS
+ * ========================================
+ */
+
+.kensan-menu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  position: relative;
+}
+
+.kensan-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.8rem;
+  font-size: 0.9rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.kensan-menu-item:not(.active):not(.disabled):hover {
+  background-color: rgba(255,255,255,0.02);
+}
+
+.kensan-menu-item.active {
+  color: var(--color-kensan-white);
+  font-weight: 600;
+}
+
+.kensan-menu-item:not(.active) {
+  color: var(--color-kensan-light_gray);
+  font-weight: 400;
+}
+
+.kensan-menu-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kensan-menu-item .material-symbols-outlined {
+  font-size: 19px;
+  transition: color 0.15s ease;
+}
+
+.kensan-menu-item.active .material-symbols-outlined {
+  color: var(--color-kensan-white);
+}
+
+.kensan-menu-item:not(.active) .material-symbols-outlined {
+  color: var(--color-kensan-light_gray);
+}
+
+.kensan-menu-item-label {
+  transition: color 0.15s ease;
+}
+
+.kensan-menu-indicator {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 32px;
+  background-color: var(--color-kensan-white);
+  border-radius: 2px;
+  animation: fadeIn 0.2s ease-in;
+}
+
+/* 
+ * ========================================
+ * 📄 HEADER
+ * ========================================
+ */
+
+.kensan-header {
+  width: 100%;
+  padding: 2rem 2.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.kensan-header-title {
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: var(--color-kensan-white);
+  margin-bottom: 0.25rem;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.4));
+}
+
+.kensan-header-subtitle {
+  font-size: 0.95rem;
+  color: var(--color-kensan-light_gray);
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* 
+ * ========================================
+ * 🔌 POWER BUTTON (3 staten)
+ * ========================================
+ */
+
+.kensan-power-btn {
+  background-color: var(--color-kensan-black);
+  border: 2px solid;
+  border-radius: 10px;
+  min-width: 150px;
+  height: 46px;
+  padding: 0.55rem 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Groen - Systeem AAN */
+.kensan-power-btn.power-on {
+  border-color: var(--color-kensan-power-on);
+  box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-on) r g b / 0.1), 0 0 14px rgb(from var(--color-kensan-power-on) r g b / 0.16);
+}
+
+.kensan-power-btn.power-on:hover {
+  box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-on) r g b / 0.16), 0 0 18px rgb(from var(--color-kensan-power-on) r g b / 0.22);
+}
+
+/* Rood - Systeem UIT */
+.kensan-power-btn.power-off {
+  border-color: var(--color-kensan-power-off);
+  box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-off) r g b / 0.1), 0 0 14px rgb(from var(--color-kensan-power-off) r g b / 0.16);
+}
+
+.kensan-power-btn.power-off:hover {
+  box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-off) r g b / 0.16), 0 0 18px rgb(from var(--color-kensan-power-off) r g b / 0.22);
+}
+
+/* Blauw - Bezig/Processing */
+.kensan-power-btn.power-busy {
+  border-color: var(--color-kensan-power-busy);
+  box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-busy) r g b / 0.1), 0 0 14px rgb(from var(--color-kensan-power-busy) r g b / 0.16);
+}
+
+.kensan-power-btn.power-busy:hover {
+  box-shadow: 0 0 0 1px rgb(from var(--color-kensan-power-busy) r g b / 0.16), 0 0 18px rgb(from var(--color-kensan-power-busy) r g b / 0.22);
+}
+
+.kensan-power-btn .material-symbols-outlined {
+  color: var(--color-kensan-white);
+  font-size: 25px;
+}
+
+/* 
+ * ========================================
+ * 📊 DASHBOARD GRID
+ * ========================================
+ */
+
+.kensan-dashboard-main {
+  flex: 1;
+  padding: 0 2.5rem 2rem 2.5rem;
+}
+
+.kensan-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas: 
+    "top1 top2 top3"
+    "wide wide tall"
+    "bot1 bot2 tall";
+  gap: 1rem;
+}
+
+.kensan-card {
+  background-color: var(--color-kensan-black);
+  border-radius: 10px;
+}
+
+.kensan-card.top1 { grid-area: top1; min-height: 80px; }
+.kensan-card.top2 { grid-area: top2; min-height: 80px; }
+.kensan-card.top3 { grid-area: top3; min-height: 80px; }
+.kensan-card.wide { grid-area: wide; min-height: 260px; }
+.kensan-card.tall { grid-area: tall; min-height: 420px; }
+.kensan-card.bot1 { grid-area: bot1; min-height: 180px; }
+.kensan-card.bot2 { grid-area: bot2; min-height: 180px; }
+
+/* 
+ * ========================================
+ * ✨ ANIMATIONS
+ * ========================================
+ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scaleY(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1);
+  }
+}
+
+/* 
+ * ========================================
+ * 📱 RESPONSIVE
+ * ========================================
+ */
+
+@media (max-width: 1024px) {
+  .kensan-dashboard-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-areas: 
+      "top1"
+      "top2"
+      "top3"
+      "wide"
+      "tall"
+      "bot1"
+      "bot2" !important;
+  }
+}
