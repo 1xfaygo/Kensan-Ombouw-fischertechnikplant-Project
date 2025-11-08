@@ -1,66 +1,129 @@
 import { useLogin } from "@refinedev/core";
-import { useEffect, useRef } from "react";
-
-import { CredentialResponse } from "../interfaces/google";
-
-// Todo: Update your Google Client ID here
-const GOOGLE_CLIENT_ID =
-  "1041339102270-e1fpe2b6v6u1didfndh7jkjmpcashs4f.apps.googleusercontent.com";
+import { useState } from "react";
+import "../kensan.css";
+import "../login.css";
 
 export const Login: React.FC = () => {
-  const { mutate: login } = useLogin<CredentialResponse>();
+  const { mutate: login } = useLogin();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
-  const GoogleButton = () => {
-    const divRef = useRef<HTMLDivElement>(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
-    useEffect(() => {
-      if (typeof window === "undefined" || !window.google || !divRef.current) {
-        return;
+    login(
+      { email, password },
+      {
+        onError: (error) => {
+          setError(error.message || "Invalid email or password");
+          setIsLoading(false);
+        },
+        onSuccess: () => {
+          setIsLoading(false);
+        },
       }
+    );
+  };
 
-      try {
-        window.google.accounts.id.initialize({
-          ux_mode: "popup",
-          client_id: GOOGLE_CLIENT_ID,
-          callback: async (res: CredentialResponse) => {
-            if (res.credential) {
-              login(res);
-            }
-          },
-        });
-        window.google.accounts.id.renderButton(divRef.current, {
-          theme: "filled_blue",
-          size: "medium",
-          type: "standard",
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    }, []);
-
-    return <div ref={divRef} />;
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.remove("light-mode");
+    } else {
+      document.documentElement.classList.add("light-mode");
+    }
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-      }}
-    >
-      <GoogleButton />
-      <p>
-        Powered by
-        <img
-          style={{ padding: "0 5px" }}
-          alt="Google"
-          src="https://refine.ams3.cdn.digitaloceanspaces.com/superplate-auth-icons%2Fgoogle.svg"
-        />
-        Google
-      </p>
+    <div className="kensan-login-container">
+      <div className="kensan-login-theme-toggle">
+        <button
+          className={`kensan-theme-toggle-btn ${!isDarkMode ? "light" : ""}`}
+          onClick={toggleTheme}
+        >
+          <span className="material-symbols-outlined kensan-theme-icon sunny">
+            sunny
+          </span>
+          <span className="material-symbols-outlined kensan-theme-icon dark_mode">
+            dark_mode
+          </span>
+        </button>
+      </div>
+
+      <div className="kensan-login-card">
+        <div className="kensan-login-header">
+          <img
+            src="/logo.png"
+            alt="Kensan Logo"
+            className="kensan-login-logo"
+          />
+          <p className="kensan-login-subtitle">Login to continue</p>
+        </div>
+
+        {error && <div className="kensan-login-error">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="kensan-login-form-group">
+            <label htmlFor="email" className="kensan-login-label">
+              Email
+            </label>
+            <div className="kensan-login-input-wrapper">
+              <span className="material-symbols-outlined kensan-login-input-icon">
+                person
+              </span>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="your@email.com"
+                className="kensan-login-input"
+              />
+            </div>
+          </div>
+
+          <div className="kensan-login-form-group">
+            <label htmlFor="password" className="kensan-login-label">
+              Password
+            </label>
+            <div className="kensan-login-input-wrapper">
+              <span className="material-symbols-outlined kensan-login-input-icon">
+                lock
+              </span>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                className="kensan-login-input kensan-login-input-with-icon-right"
+              />
+              <span
+                className="material-symbols-outlined kensan-login-input-icon-right"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "visibility_off" : "visibility"}
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="kensan-login-button"
+          >
+            {isLoading ? "Loading..." : "Login"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

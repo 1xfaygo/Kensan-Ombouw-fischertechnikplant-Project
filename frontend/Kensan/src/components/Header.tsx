@@ -1,61 +1,38 @@
 import React from 'react';
-
-/**
- * HEADER - Hallo username + datum + uitlog knop
- */
+import { useGetIdentity } from '@refinedev/core';
 
 interface HeaderProps {
-  username?: string;
   buttonColor?: 'green' | 'blue' | 'red';
 }
 
-function Header({ username = 'username', buttonColor = 'green' }: HeaderProps) {
-  const borderColors = {
-    green: '#00FF00',
-    blue: '#00B0FF', 
-    red: '#FF0000'
-  };
+function Header({ buttonColor = 'green' }: HeaderProps) {
+  const { data: identity } = useGetIdentity();
+  
+  const username = identity?.name || identity?.email?.split('@')[0] || 'User';
+  
+  const now = new Date();
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                  'July', 'August', 'September', 'October', 'November', 'December'];
+  const month = months[now.getMonth()];
+  const day = now.getDate();
+
+  const powerBtnClass = buttonColor === 'green' ? 'power-on' : 
+                        buttonColor === 'blue' ? 'power-busy' : 
+                        'power-off';
 
   return (
-    <div 
-      className="w-full px-8 py-6 flex items-start justify-between"
-      style={{ backgroundColor: '#171717' }}
-    >
-      {/* LINKS: Hallo tekst */}
+    <div className="kensan-header">
       <div>
-        <h1 
-          className="text-3xl mb-1"
-          style={{ 
-            color: '#FFFFFF',
-            filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))'
-          }}
-        >
-          Hallo, {'{username}'}
+        <h1 className="kensan-header-title">
+          Hello, {username}
         </h1>
-        <p 
-          className="text-base"
-          style={{ 
-            color: '#525252',
-            filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))'
-          }}
-        >
-          » {'{maand}'} {'{dag}'}
+        <p className="kensan-header-subtitle">
+          » {month} {day}
         </p>
       </div>
 
-      {/* RECHTS: Uitlog knop */}
-      <button 
-        className="px-10 py-3 rounded-lg border-2"
-        style={{ 
-          backgroundColor: 'transparent',
-          borderColor: borderColors[buttonColor],
-          filter: 'drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25))'
-        }}
-      >
-        <span 
-          className="material-symbols-outlined"
-          style={{ color: '#FFFFFF', fontSize: '24px' }}
-        >
+      <button className={`kensan-power-btn ${powerBtnClass}`}>
+        <span className="material-symbols-outlined">
           power_settings_new
         </span>
       </button>

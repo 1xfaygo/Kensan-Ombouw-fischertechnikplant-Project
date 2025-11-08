@@ -129,6 +129,49 @@
   padding: 0.45rem 0.6rem;
 }
 
+.kensan-logout-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 0.5rem;
+  background-color: var(--color-kensan-black);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 0.2s ease-out forwards;
+}
+
+.kensan-logout-menu.closing {
+  animation: fadeOutDown 0.15s ease-in forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
 .kensan-user-icon {
   width: 26px;
   height: 26px;

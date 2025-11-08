@@ -1,14 +1,5 @@
-import React, { useState } from 'react';
-
-/**
- * KENSAN SIDEBAR - EXACTLY AS IN THE EXPRESSJS DESIGN
- * 
- * Vertical sidebar on the left with:
- * - Logo at the top
- * - Menu items stacked vertically with white bar on left and right when active
- * - Light mode toggle at the bottom
- * - User status at the very bottom
- */
+import React, { useState, useEffect, useRef } from 'react';
+import { useLogout, useGetIdentity } from '@refinedev/core';
 
 interface SidebarProps {
   activeItem?: string;
@@ -17,21 +8,43 @@ interface SidebarProps {
 function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) {
   const [activeItem, setActiveItem] = useState(initialActiveItem);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [showLogoutMenu, setShowLogoutMenu] = useState<boolean | 'closing'>(false);
+  
+  const { mutate: logout } = useLogout();
+  const { data: identity } = useGetIdentity();
+  
+  const username = identity?.name || identity?.email?.split('@')[0] || 'Guest';
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        if (showLogoutMenu === true) {
+          setShowLogoutMenu('closing');
+        }
+      }
+    };
+
+    if (showLogoutMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showLogoutMenu]);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-    // Toggle light-mode class on the root element
     if (!isDarkMode) {
       document.documentElement.classList.remove('light-mode');
     } else {
       document.documentElement.classList.add('light-mode');
     }
-    console.log(`Theme switched to: ${!isDarkMode ? 'Light' : 'Dark'} mode`);
   };
 
   return (
     <div className="kensan-sidebar">
-      {/* LOGO AT THE TOP */}
       <div style={{ padding: '0 0.5rem 1rem' }}>
         <img 
           src="/logo.png" 
@@ -40,10 +53,8 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
         />
       </div>
 
-      {/* DIVIDER */}
       <div className="kensan-divider" />
 
-      {/* MENU ITEMS - VERTICAL */}
       <nav className="kensan-menu">
         <MenuItem 
           icon="dashboard"
@@ -77,49 +88,85 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
         />
       </nav>
 
-      {/* SIDEBAR FOOTER */}
       <div className="kensan-sidebar-footer">
-        {/* THEME TOGGLE */}
         <div style={{ padding: '0.35rem 0.6rem' }}>
           <button 
             className={`kensan-theme-toggle-btn ${!isDarkMode ? 'light' : ''}`}
             onClick={toggleTheme}
           >
-            {/* Sunny icon - visible in DARK mode (left) */}
             <span className="material-symbols-outlined kensan-theme-icon sunny">
               sunny
             </span>
-            
-            {/* Dark mode icon - visible in LIGHT mode (right) */}
             <span className="material-symbols-outlined kensan-theme-icon dark_mode">
               dark_mode
             </span>
           </button>
         </div>
 
-        {/* DIVIDER */}
         <div className="kensan-divider" style={{ margin: 0 }} />
 
-        {/* USER INFO */}
-        <div className="kensan-user-info">
-          {/* User Icon */}
+        <div className="kensan-user-info" style={{ position: 'relative' }} ref={menuRef}>
           <div className="kensan-user-icon">
             <span className="material-symbols-outlined">
               person
             </span>
           </div>
 
-          {/* "not logged in" text */}
-          <span className="kensan-user-status">
-            not logged in
+          <span className="kensan-user-status" style={{ flex: 1 }}>
+            {username}
           </span>
 
-          {/* Settings icon */}
-          <div className="kensan-user-icon">
+          <div 
+            className="kensan-user-icon" 
+            style={{ cursor: 'pointer' }}
+            onClick={() => setShowLogoutMenu(showLogoutMenu ? 'closing' : true)}
+          >
             <span className="material-symbols-outlined">
               settings
             </span>
           </div>
+
+          {showLogoutMenu && (
+            <div
+              className={`kensan-logout-menu ${showLogoutMenu === 'closing' ? 'closing' : ''}`}
+              onAnimationEnd={() => {
+                if (showLogoutMenu === 'closing') {
+                  setShowLogoutMenu(false);
+                }
+              }}
+            >
+              <button
+                onClick={() => {
+                  setShowLogoutMenu(false);
+                  logout();
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: 'var(--color-kensan-white)',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  transition: 'background-color 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                  logout
+                </span>
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
