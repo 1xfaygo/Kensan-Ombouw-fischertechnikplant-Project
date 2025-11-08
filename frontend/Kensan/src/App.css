@@ -81,6 +81,10 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 110%;
+}
+
 body {
   background-color: var(--color-kensan-gray);
   color: var(--color-kensan-white);
