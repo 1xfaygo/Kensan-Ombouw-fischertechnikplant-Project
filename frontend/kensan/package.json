@@ -12,12 +12,6 @@
     "@refinedev/simple-rest": "^6.0.0",
     "@tailwindcss/vite": "^4.1.8",
     "axios": "^1.6.2",
-    "bcrypt": "^6.0.0",
-    "better-sqlite3": "^12.4.1",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.0.2",
@@ -43,9 +37,7 @@
     "dev": "refine dev",
     "build": "tsc && refine build",
     "start": "refine start",
-    "refine": "refine",
-    "server": "node server/server.js",
-    "dev:full": "concurrently \"npm run server\" \"npm run dev\""
+    "refine": "refine"
   },
   "browserslist": {
     "production": [

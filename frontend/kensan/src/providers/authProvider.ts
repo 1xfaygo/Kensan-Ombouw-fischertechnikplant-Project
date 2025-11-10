@@ -34,7 +34,7 @@ export const authProvider: AuthProvider = {
         success: false,
         error: {
           name: "LoginError",
-          message: error?.response?.data?.message || "Login failed",
+          message: error?.response?.data?.message || "Invalid email or password",
         },
       };
     }
@@ -56,23 +56,18 @@ export const authProvider: AuthProvider = {
   },
 
   check: async () => {
-    try {
-      const { data } = await axios.get(`${API_URL}/auth/me`);
-      
-      if (data.success) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        return {
-          authenticated: true,
-        };
-      }
-    } catch (error) {
-      localStorage.removeItem("user");
+    const user = localStorage.getItem("user");
+    
+    if (user) {
+      return {
+        authenticated: true,
+      };
     }
 
     return {
       authenticated: false,
       redirectTo: "/login",
-      logout: true,
+      logout: false,
     };
   },
 

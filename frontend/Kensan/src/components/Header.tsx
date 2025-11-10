@@ -27,7 +27,7 @@ function Header({ buttonColor = 'green' }: HeaderProps) {
           Hello, {username}
         </h1>
         <p className="kensan-header-subtitle">
-          » {month} {day}
+          » {day} {month}
         </p>
       </div>
 

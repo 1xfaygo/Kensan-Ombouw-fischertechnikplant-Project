@@ -1,8 +1,9 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
-import { verifyUser, getUserById, initDefaultUser, createUser } from './auth.js';
+import { verifyUser, getUserById, initDefaultUser, createUser, deleteUserByEmail } from './auth.js';
+import type { JWTPayload } from './types.js';
 
 const app = express();
 const PORT = 3000;
@@ -18,7 +19,7 @@ app.use(cookieParser());
 
 initDefaultUser();
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', (req: Request, res: Response) => {
   const { email, password } = req.body;
   
   if (!email || !password) {
@@ -38,7 +39,7 @@ app.post('/api/auth/login', (req, res) => {
   }
   
   const token = jwt.sign(
-    { userId: user.id, email: user.email, role: user.role },
+    { userId: user.id, email: user.email, role: user.role } as JWTPayload,
     JWT_SECRET,
     { expiresIn: JWT_EXPIRY }
   );
@@ -61,12 +62,12 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
-app.post('/api/auth/logout', (req, res) => {
+app.post('/api/auth/logout', (req: Request, res: Response) => {
   res.clearCookie('auth_token');
   res.json({ success: true });
 });
 
-app.get('/api/auth/me', (req, res) => {
+app.get('/api/auth/me', (req: Request, res: Response) => {
   const token = req.cookies.auth_token;
   
   if (!token) {
@@ -77,7 +78,7 @@ app.get('/api/auth/me', (req, res) => {
   }
   
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
     const user = getUserById(decoded.userId);
     
     if (!user) {
@@ -99,7 +100,7 @@ app.get('/api/auth/me', (req, res) => {
   }
 });
 
-app.post('/api/auth/register', (req, res) => {
+app.post('/api/auth/register', (req: Request, res: Response) => {
   const { email, password, name } = req.body;
   
   if (!email || !password || !name) {
@@ -117,7 +118,7 @@ app.post('/api/auth/register', (req, res) => {
       success: true,
       user
     });
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({
       success: false,
       message: error.message === 'Email already exists' ? 'Email already exists' : 'Registration failed'
@@ -125,7 +126,31 @@ app.post('/api/auth/register', (req, res) => {
   }
 });
 
+app.post('/api/auth/deluser', (req: Request, res: Response) => {
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email is required'
+    });
+  }
+  
+  try {
+    deleteUserByEmail(email);
+    res.json({
+      success: true,
+      message: 'User deleted successfully'
+    });
+  } catch (error: any) {
+    res.status(404).json({
+      success: false,
+      message: error.message === 'User not found' ? 'User not found' : 'Failed to delete user'
+    });
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Kensan Auth Server running on http://localhost:${PORT}`);
-  console.log(`🔐 Default login: admin@kensan.nl / admin123`);
+  console.log(`Kensan Auth Server running on http://localhost:${PORT}`);
+  console.log(`Default login: admin@kensan.nl / admin123`);
 });

@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt';
 import db from './db.js';
+import type { User, UserWithoutPassword } from './types.js';
 
 const SALT_ROUNDS = 10;
 
-export function createUser(email, password, name, role = 'user') {
+export function createUser(email: string, password: string, name: string, role: string = 'user'): number {
   const hashedPassword = bcrypt.hashSync(password, SALT_ROUNDS);
   
   try {
@@ -11,8 +12,8 @@ export function createUser(email, password, name, role = 'user') {
       'INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)'
     );
     const result = stmt.run(email, hashedPassword, name, role);
-    return result.lastInsertRowid;
-  } catch (error) {
+    return Number(result.lastInsertRowid);
+  } catch (error: any) {
     if (error.code === 'SQLITE_CONSTRAINT') {
       throw new Error('Email already exists');
     }
@@ -20,9 +21,9 @@ export function createUser(email, password, name, role = 'user') {
   }
 }
 
-export function verifyUser(email, password) {
+export function verifyUser(email: string, password: string): UserWithoutPassword | null {
   const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
-  const user = stmt.get(email);
+  const user = stmt.get(email) as User | undefined;
   
   if (!user) {
     return null;
@@ -38,21 +39,32 @@ export function verifyUser(email, password) {
   return userWithoutPassword;
 }
 
-export function getUserById(id) {
+export function getUserById(id: number): UserWithoutPassword | undefined {
   const stmt = db.prepare('SELECT id, email, name, role FROM users WHERE id = ?');
-  return stmt.get(id);
+  return stmt.get(id) as UserWithoutPassword | undefined;
 }
 
-export function getAllUsers() {
+export function getAllUsers(): UserWithoutPassword[] {
   const stmt = db.prepare('SELECT id, email, name, role, created_at FROM users');
-  return stmt.all();
+  return stmt.all() as UserWithoutPassword[];
 }
 
-export function initDefaultUser() {
-  const stmt = db.prepare('SELECT COUNT(*) as count FROM users');
-  const { count } = stmt.get();
+export function deleteUserByEmail(email: string): boolean {
+  const stmt = db.prepare('DELETE FROM users WHERE email = ?');
+  const result = stmt.run(email);
   
-  if (count === 0) {
+  if (result.changes === 0) {
+    throw new Error('User not found');
+  }
+  
+  return true;
+}
+
+export function initDefaultUser(): void {
+  const stmt = db.prepare('SELECT COUNT(*) as count FROM users');
+  const result = stmt.get() as { count: number };
+  
+  if (result.count === 0) {
     console.log('Creating default admin user...');
     createUser('admin@kensan.nl', 'admin123', 'Administrator', 'admin');
     console.log('Default user created: admin@kensan.nl / admin123');
