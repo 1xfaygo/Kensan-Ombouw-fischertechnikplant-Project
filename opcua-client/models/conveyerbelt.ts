@@ -1,18 +1,13 @@
 import { DataType, ClientSession } from "node-opcua";
 import { BaseModel } from "./base";
 
-export class LoopbandModel extends BaseModel {
+export class Conveyerbelt extends BaseModel {
     constructor(session: ClientSession, ns: number) {
-        super(session, ns, "Loopband");
+        super(session, ns, "Conveyerbelt");
     }
 
     async isRunning() { return this.read("Running"); }
     async setRunning(value: boolean) { return this.write("Running", value, DataType.Boolean); }
-
-    async start() {
-        await this.setRunning(true);
-        console.log("Loopband started.");
-    }
 
     async checkColor(color: "Red" | "White" | "Blue") {
         return this.read(`Color${color}`);
@@ -27,9 +22,15 @@ export class LoopbandModel extends BaseModel {
         await this.write(`Piston${piston}`, false, DataType.Boolean);
     }
 
+
+    async start() {
+        await this.setRunning(true);
+        console.log("Conveyerbelt started.");
+    }
+
     async stop() {
         await this.setRunning(false);
-        console.log("Loopband stopped.");
+        console.log("Conveyerbelt stopped.");
     }
 
 }

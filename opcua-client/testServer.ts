@@ -14,9 +14,8 @@ async function start() {
     const namespace = addressSpace.getOwnNamespace();
 
     await server.start();
-    console.log("Simple OPC UA Server Running");
+    console.log("Test opcua Server Running");
     console.log("Endpoint:", server.getEndpointUrl());
-    console.log("NodeId to test: ns=1;s=MyNumber");
 }
 
 start();

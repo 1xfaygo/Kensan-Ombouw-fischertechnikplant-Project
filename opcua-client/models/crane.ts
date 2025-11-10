@@ -14,12 +14,26 @@ export class Crane extends BaseModel {
 
 
     async stop() {
+        if (!(await this.isRunning())) {
+            console.log("Crane is already stopped.");
+            return;
+        }
         await this.setRunning(false);
         console.log("Crane stopped.");
     }
 
     async start() {
+        if (await this.isRunning()) {
+            console.log("Crane is already running.");
+            return;
+        }
         await this.setRunning(true);
         console.log("Crane started")
+    }
+
+    async moveTo(position: number) {
+        await this.setLocation(position);
+        await this.start();
+        console.log(`Crane moving to position ${position}`);
     }
 }
