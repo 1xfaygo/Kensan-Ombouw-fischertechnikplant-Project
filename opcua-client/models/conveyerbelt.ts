@@ -24,11 +24,13 @@ export class Conveyerbelt extends BaseModel {
 
 
     async start() {
+        if (await this.isRunning()) { console.log("Conveyerbelt is already running."); return; }
         await this.setRunning(true);
         console.log("Conveyerbelt started.");
     }
 
     async stop() {
+        if (!(await this.isRunning())) { console.log("Conveyerbelt is already stopped."); return; }
         await this.setRunning(false);
         console.log("Conveyerbelt stopped.");
     }

@@ -11,20 +11,14 @@ export class Oven extends BaseModel {
 
 
     async stop() {
-        if (!(await this.isRunning())) {
-            console.log("Oven is already stopped.");
-            return;
-        }
+        if (!(await this.isRunning())) { console.log("Oven is already stopped."); return; }
         await this.setRunning(false);
         console.log("Oven stopped.");
     }
 
     async start() {
-        if (await this.isRunning()) {
-            console.log("Oven is already running.");
-            return;
-        }
+        if (await this.isRunning()) { console.log("Oven is already running."); return; }
         await this.setRunning(true);
-        console.log("Oven started")
+        console.log("Oven started.");
     }
 }

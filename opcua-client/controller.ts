@@ -20,6 +20,13 @@ async function main() {
         const oven = new Oven(session, ns);
         const warehouse = new Warehouse(session, ns);
 
+        await warehouse.getBox([3, 3]);
+        await crane.moveTo(1);
+        await oven.start();
+        await conveyerBelt.start();
+        await crane.moveTo(0);
+        await warehouse.storeBox([3, 3]);
+
         await session.close();
         console.log("Session closed");
 
