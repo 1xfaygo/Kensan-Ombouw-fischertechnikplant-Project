@@ -9,23 +9,31 @@ export class Crane extends BaseModel {
     async getLocation() { return this.read("Location"); }
     async setLocation(value: number) { return this.write("Location", value, DataType.Int16); }
 
-    async pickUp() { return this.write("PickUp", true, DataType.Boolean); }
-    async drop() { return this.write("Drop", true, DataType.Boolean); }
+    async pickUp() {
+        await this.write("PickUp", true, DataType.Boolean);
+        await this.start();
+        await this.waitForFinish();
+    }
+
+    async drop() {
+        await this.write("Drop", true, DataType.Boolean);
+        await this.start();
+        await this.waitForFinish();
+    }
 
     async moveTo(position: number) {
         await this.setLocation(position);
+        console.log(`Crane moving to position ${position}.`);
         await this.start();
         await this.waitForFinish();
-        console.log(`Crane moving to position ${position}`);
     }
 
     async moveAndPickUp([pickPos, dropPos]: number[]) {
         await this.moveTo(pickPos);
+        console.log(`Crane picking up item at position ${pickPos}.`);
         await this.pickUp();
-        await this.waitForFinish();
         await this.moveTo(dropPos);
+        console.log(`Crane dropping item at position ${dropPos}.`);
         await this.drop();
-        await this.waitForFinish();
-        console.log(`Crane picked up item at position ${pickPos} and dropped it at position ${dropPos}`);
     }
 }

@@ -13,7 +13,7 @@ async function main() {
         console.log("Connected to OPC UA server");
 
         const session = await client.createSession();
-        const ns = 2;
+        const ns = 1;
 
         const crane = new Crane(session, ns)
         const conveyerBelt = new Conveyerbelt(session, ns);
@@ -21,10 +21,10 @@ async function main() {
         const warehouse = new Warehouse(session, ns);
 
         await warehouse.getBox([3, 3]);
-        await crane.moveTo(1);
+        await crane.moveAndPickUp([0, 1]);
         await oven.start();
         await conveyerBelt.start();
-        await crane.moveTo(0);
+        await crane.moveAndPickUp([2, 0]);
         await warehouse.storeBox([3, 3]);
 
         await session.close();
