@@ -29,4 +29,25 @@ export class BaseModel {
             value: { value: { dataType, value } }
         });
     }
+
+    async isRunning() { return this.read("Running"); }
+    async setRunning(value: boolean) { return this.write("Running", value, DataType.Boolean); }
+
+    async start() {
+        if (await this.isRunning()) { console.log(`${this.name} is already running.`); return; }
+        await this.setRunning(true);
+        console.log(`${this.name} started.`);
+    }
+
+    async stop() {
+        if (!(await this.isRunning())) { console.log(`${this.name} is already stopped.`); return; }
+        await this.setRunning(false);
+        console.log(`${this.name} stopped.`);
+    }
+
+    async waitForFinish() {
+        while (await this.isRunning()) {
+            await new Promise(res => setTimeout(res, 200));
+        }
+    }
 }
