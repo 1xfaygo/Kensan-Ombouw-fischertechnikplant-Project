@@ -6,6 +6,7 @@ import "./App.css";
 import { authProvider } from "./providers/authProvider";
 import Dashboard from "./pages/dashboard";
 import { Login } from "./pages/login";
+import { AccountSettings } from "./pages/settings";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             }
           >
             <Route path="/" element={<Dashboard />} />
+            <Route path="/settings" element={<AccountSettings />} />
           </Route>
 
           <Route

@@ -25,13 +25,19 @@ export function verifyUser(email: string, password: string): UserWithoutPassword
   const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
   const user = stmt.get(email) as User | undefined;
   
+  console.log('Verifying user:', email, 'Found:', !!user);
+  
   if (!user) {
+    console.log('User not found in database');
     return null;
   }
   
   const isValid = bcrypt.compareSync(password, user.password);
   
+  console.log('Password validation:', isValid);
+  
   if (!isValid) {
+    console.log('Invalid password for user:', email);
     return null;
   }
   
@@ -40,7 +46,7 @@ export function verifyUser(email: string, password: string): UserWithoutPassword
 }
 
 export function getUserById(id: number): UserWithoutPassword | undefined {
-  const stmt = db.prepare('SELECT id, email, name, role FROM users WHERE id = ?');
+  const stmt = db.prepare('SELECT id, email, name, role, profile_picture FROM users WHERE id = ?');
   return stmt.get(id) as UserWithoutPassword | undefined;
 }
 

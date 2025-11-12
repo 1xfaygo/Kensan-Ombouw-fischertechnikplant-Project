@@ -1,7 +1,10 @@
 import { useLogin } from "@refinedev/core";
 import { useState } from "react";
+import axios from "axios";
 import "../kensan.css";
 import "../login.css";
+
+const API_URL = "http://localhost:3000/api";
 
 export const Login: React.FC = () => {
   const { mutate: login } = useLogin();
@@ -15,20 +18,32 @@ export const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
+    // Frontend validatie
+    if (!email || !password) {
+      setError("Email and password are required");
+      return;
+    }
+
     setIsLoading(true);
 
-    login(
-      { email, password },
-      {
-        onError: (error) => {
-          setError(error.message || "Invalid email or password");
-          setIsLoading(false);
-        },
-        onSuccess: () => {
-          setIsLoading(false);
-        },
+    try {
+      const { data } = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password,
+      }, {
+        withCredentials: true
+      });
+
+      if (data.success) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        window.location.href = "/";
       }
-    );
+    } catch (err: any) {
+      console.log('Login failed:', err);
+      setError(err?.response?.data?.message || "Invalid email or password");
+      setIsLoading(false);
+    }
   };
 
   const toggleTheme = () => {
@@ -66,9 +81,9 @@ export const Login: React.FC = () => {
           <p className="kensan-login-subtitle">Login to continue</p>
         </div>
 
-        {error && <div className="kensan-login-error">{error}</div>}
-
         <form onSubmit={handleSubmit}>
+          {error && <div className="kensan-login-error">{error}</div>}
+          
           <div className="kensan-login-form-group">
             <label htmlFor="email" className="kensan-login-label">
               Email
@@ -82,7 +97,6 @@ export const Login: React.FC = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 placeholder="your@email.com"
                 className="kensan-login-input"
               />
@@ -102,7 +116,6 @@ export const Login: React.FC = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
                 placeholder="••••••••"
                 className="kensan-login-input kensan-login-input-with-icon-right"
               />

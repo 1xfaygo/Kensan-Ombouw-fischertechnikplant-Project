@@ -8,13 +8,18 @@ axios.defaults.withCredentials = true;
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
     try {
+      console.log('Attempting login for:', email);
+      
       const { data } = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
       });
 
+      console.log('Login response:', data);
+
       if (data.success) {
         localStorage.setItem("user", JSON.stringify(data.user));
+        console.log('Login successful, user stored');
         
         return {
           success: true,
@@ -22,6 +27,8 @@ export const authProvider: AuthProvider = {
         };
       }
 
+      console.error('Login failed:', data.message);
+      
       return {
         success: false,
         error: {
@@ -30,6 +37,12 @@ export const authProvider: AuthProvider = {
         },
       };
     } catch (error: any) {
+      console.error('Login error:', {
+        message: error?.response?.data?.message,
+        status: error?.response?.status,
+        data: error?.response?.data
+      });
+      
       return {
         success: false,
         error: {
