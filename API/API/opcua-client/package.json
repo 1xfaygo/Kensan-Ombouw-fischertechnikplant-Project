@@ -1,14 +1,20 @@
 {
-  "scripts": {
-    "server": "ts-node testServer.ts",
-    "client": "ts-node controller.ts"
+  "name": "opcua-project",
+  "version": "1.0.0",
+ "scripts": {
+  "start:server": "ts-node src/testServer/server.ts",
+  "start:api": "ts-node src/backend/api.ts"
   },
   "dependencies": {
-    "api": "file:..",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
     "node-opcua": "^2.157.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
     "@types/node": "^24.10.0",
+    "concurrently": "^8.2.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

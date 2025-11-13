@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+ <div>Oven temperatuur: <span id="ovenTemp"></span></div>
+<div>Kraan positie: <span id="cranePos"></span></div>
+   
+</body>
+<script>
+async function fetchAllData() {
+  try {
+    const res = await fetch("http://localhost:3000/api/all");
+    const data = await res.json();
+    console.log(data);
+
+    // Voorbeeld: update je pagina
+    document.getElementById("ovenTemp").innerText = data.ovenTemperature;
+    document.getElementById("cranePos").innerText = data.cranePosition;
+    // enzovoort voor alle nodes
+  } catch (err) {
+    console.error("Fout bij ophalen van data:", err);
+  }
+}
+
+// Ophalen bij laden van pagina
+fetchAllData();
+
+// Optioneel: elke 5 seconden refreshen
+setInterval(fetchAllData, 5000);
+
+</script>
+</html>

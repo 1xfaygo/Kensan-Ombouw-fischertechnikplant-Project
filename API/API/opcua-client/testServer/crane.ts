@@ -34,8 +34,8 @@ export function createCraneObject(namespace: Namespace) {
 
     namespace.addVariable({
         componentOf: crane,
-        browseName: "Location",
-        nodeId: "ns=1;s=Crane.Location",
+        browseName: "Position",
+        nodeId: "ns=1;s=Crane.Position",
         minimumSamplingInterval: 100,
         dataType: "Int16",
         value: {
@@ -43,6 +43,23 @@ export function createCraneObject(namespace: Namespace) {
             set: (variant) => {
                 cranePos = variant.value;
                 console.log(`Crane position set to ${variant.value}`);
+                return StatusCodes.Good;
+            }
+        }
+    });
+
+    let craneLoad = 0;
+    namespace.addVariable({
+        componentOf: crane,
+        browseName: "Load",
+        nodeId: "ns=1;s=Crane.Load",
+        minimumSamplingInterval: 100,
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: craneLoad }),
+            set: (variant) => {
+                craneLoad = variant.value;
+                console.log(`Crane load set to ${variant.value}`);
                 return StatusCodes.Good;
             }
         }

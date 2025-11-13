@@ -4,6 +4,7 @@ export function createWarehouseObject(namespace: Namespace) {
     let warehouseX = 1;
     let warehouseY = 1;
     let warehouseRunning = false;
+    let warehouseStock = 25;
 
     const warehouse = namespace.addObject({
         browseName: "Warehouse",
@@ -94,6 +95,22 @@ export function createWarehouseObject(namespace: Namespace) {
                 if (variant.value) {
                     console.log(`Warehouse storing at (${warehouseX}, ${warehouseY})`);
                 }
+                return StatusCodes.Good;
+            }
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: warehouse,
+        browseName: "Stock",
+        nodeId: "ns=1;s=Warehouse.Stock",
+        minimumSamplingInterval: 100,
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: warehouseStock }),
+            set: (variant) => {
+                warehouseStock = variant.value;
+                console.log(`Warehouse stock set to ${variant.value}`);
                 return StatusCodes.Good;
             }
         }

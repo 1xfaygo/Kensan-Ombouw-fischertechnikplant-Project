@@ -2,6 +2,7 @@ import { Namespace, Variant, DataType, StatusCodes } from "node-opcua";
 
 export function createConveyerbeltObject(namespace: Namespace) {
     let conveyerRunning = false;
+    let conveyerSpeed = 1.0;
 
     const conveyerbelt = namespace.addObject({
         browseName: "Conveyerbelt",
@@ -19,6 +20,22 @@ export function createConveyerbeltObject(namespace: Namespace) {
             set: (variant) => {
                 conveyerRunning = variant.value;
                 console.log(`Conveyerbelt running state set to ${variant.value}`);
+                return StatusCodes.Good;
+            }
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: conveyerbelt,
+        browseName: "Speed",
+        nodeId: "ns=1;s=ConveyerBelt.Speed",
+        minimumSamplingInterval: 100,
+        dataType: "Double",
+        value: {
+            get: () => new Variant({ dataType: DataType.Double, value: conveyerSpeed }),
+            set: (variant) => {
+                conveyerSpeed = variant.value;
+                console.log(`Conveyerbelt speed set to ${variant.value}`);
                 return StatusCodes.Good;
             }
         }
