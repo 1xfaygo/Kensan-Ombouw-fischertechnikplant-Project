@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "server": "ts-node testServer.ts",
+    "client": "ts-node controller.ts"
+  },
+  "dependencies": {
+    "api": "file:..",
+    "node-opcua": "^2.157.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
