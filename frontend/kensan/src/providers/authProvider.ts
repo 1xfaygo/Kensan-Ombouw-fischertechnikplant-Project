@@ -8,13 +8,18 @@ axios.defaults.withCredentials = true;
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
     try {
+      console.log('Attempting login for:', email);
+      
       const { data } = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
       });
 
+      console.log('Login response:', data);
+
       if (data.success) {
         localStorage.setItem("user", JSON.stringify(data.user));
+        console.log('Login successful, user stored');
         
         return {
           success: true,
@@ -22,6 +27,8 @@ export const authProvider: AuthProvider = {
         };
       }
 
+      console.error('Login failed:', data.message);
+      
       return {
         success: false,
         error: {
@@ -30,11 +37,17 @@ export const authProvider: AuthProvider = {
         },
       };
     } catch (error: any) {
+      console.error('Login error:', {
+        message: error?.response?.data?.message,
+        status: error?.response?.status,
+        data: error?.response?.data
+      });
+      
       return {
         success: false,
         error: {
           name: "LoginError",
-          message: error?.response?.data?.message || "Login failed",
+          message: error?.response?.data?.message || "Invalid email or password",
         },
       };
     }
@@ -56,23 +69,18 @@ export const authProvider: AuthProvider = {
   },
 
   check: async () => {
-    try {
-      const { data } = await axios.get(`${API_URL}/auth/me`);
-      
-      if (data.success) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        return {
-          authenticated: true,
-        };
-      }
-    } catch (error) {
-      localStorage.removeItem("user");
+    const user = localStorage.getItem("user");
+    
+    if (user) {
+      return {
+        authenticated: true,
+      };
     }
 
     return {
       authenticated: false,
       redirectTo: "/login",
-      logout: true,
+      logout: false,
     };
   },
 

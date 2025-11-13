@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * 🎨 KLEUREN CONFIGURATIE VOOR KENSAN
+ * KLEUREN CONFIGURATIE VOOR KENSAN
  * 
  * Hier definieer je alle kleuren van je design!
  * Pas deze aan naar jouw kleurenpalet.
@@ -40,7 +40,7 @@ export const colors = {
 };
 
 /**
- * 🎨 TAILWIND KLASSEN CONFIGURATIE
+ * TAILWIND KLASSEN CONFIGURATIE
  * 
  * Hier zijn handige Tailwind class combinaties die je vaak zult gebruiken
  */

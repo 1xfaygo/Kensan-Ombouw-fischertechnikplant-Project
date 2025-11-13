@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLogout, useGetIdentity } from '@refinedev/core';
+import { useNavigate } from 'react-router';
 
 interface SidebarProps {
   activeItem?: string;
@@ -12,8 +13,10 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
   
   const { mutate: logout } = useLogout();
   const { data: identity } = useGetIdentity();
+  const navigate = useNavigate();
   
   const username = identity?.name || identity?.email?.split('@')[0] || 'Guest';
+  const profilePicture = identity?.profile_picture;
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -107,9 +110,22 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
 
         <div className="kensan-user-info" style={{ position: 'relative' }} ref={menuRef}>
           <div className="kensan-user-icon">
-            <span className="material-symbols-outlined">
-              person
-            </span>
+            {profilePicture ? (
+              <img 
+                src={`http://localhost:3000${profilePicture}`} 
+                alt="Profile" 
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '50%'
+                }}
+              />
+            ) : (
+              <span className="material-symbols-outlined">
+                person
+              </span>
+            )}
           </div>
 
           <span className="kensan-user-status" style={{ flex: 1 }}>
@@ -135,6 +151,36 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
                 }
               }}
             >
+              <button
+                onClick={() => {
+                  setShowLogoutMenu(false);
+                  navigate('/settings');
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: 'var(--color-kensan-white)',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  transition: 'background-color 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                  manage_accounts
+                </span>
+                Account Settings
+              </button>
               <button
                 onClick={() => {
                   setShowLogoutMenu(false);

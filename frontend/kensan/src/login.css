@@ -52,12 +52,24 @@
 .kensan-login-error {
   padding: 0.75rem 1rem;
   margin-bottom: 1.25rem;
-  background-color: rgba(242, 29, 29, 0.1);
-  border: 1px solid var(--color-kensan-power-off);
-  border-radius: 8px;
-  color: var(--color-kensan-power-off);
-  font-size: 0.9rem;
-  transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+  background-color: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .kensan-login-form-group {
