@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useGetIdentity } from "@refinedev/core";
+import { useGetIdentity, useLogout } from "@refinedev/core";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import "./settings.css";
@@ -8,17 +8,22 @@ interface UpdateProfileData {
   currentPassword: string;
   name?: string;
   email?: string;
-  newPassword?: string;
+  password?: string;
 }
 
 export const AccountSettings: React.FC = () => {
   const { data: identity, refetch: refetchIdentity } = useGetIdentity();
+  const { mutate: logout } = useLogout();
   
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -74,7 +79,9 @@ export const AccountSettings: React.FC = () => {
       setProfilePicture(response.data.profile_picture);
       setSelectedFile(null);
       setPreviewUrl(null);
-      refetchIdentity();
+      await refetchIdentity();
+      // Trigger sidebar update
+      window.dispatchEvent(new Event('profileUpdated'));
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to upload profile picture");
     } finally {
@@ -94,7 +101,9 @@ export const AccountSettings: React.FC = () => {
 
       setSuccessMessage("Profile picture deleted successfully!");
       setProfilePicture(null);
-      refetchIdentity();
+      await refetchIdentity();
+      // Trigger sidebar update
+      window.dispatchEvent(new Event('profileUpdated'));
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to delete profile picture");
     } finally {
@@ -141,7 +150,7 @@ export const AccountSettings: React.FC = () => {
         setIsLoading(false);
         return;
       }
-      updateData.newPassword = newPassword;
+      updateData.password = newPassword;
     }
 
     try {
@@ -159,7 +168,16 @@ export const AccountSettings: React.FC = () => {
         setNewPassword("");
         setConfirmPassword("");
       }
-      refetchIdentity();
+      await refetchIdentity();
+      // Trigger sidebar update
+      window.dispatchEvent(new Event('profileUpdated'));
+      
+      // Auto-logout after password or email change
+      if (field === 'password' || field === 'email') {
+        setTimeout(() => {
+          logout();
+        }, 2000);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || `Failed to update ${field}`);
     } finally {
@@ -198,7 +216,10 @@ export const AccountSettings: React.FC = () => {
                   <div className="kensan-profile-picture-preview">
                     {previewUrl || profilePicture ? (
                       <img
-                        src={previewUrl || `http://localhost:3000${profilePicture}`}
+                        src={previewUrl || (profilePicture?.startsWith('http') 
+                          ? profilePicture 
+                          : `http://localhost:3000/profile_pictures/${profilePicture}`
+                        )}
                         alt="Profile"
                       />
                     ) : (
@@ -253,13 +274,32 @@ export const AccountSettings: React.FC = () => {
                 </div>
                 <div className="kensan-form-group">
                   <label>Current Password</label>
-                  <input
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="kensan-input"
-                    placeholder="Verify with password"
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="kensan-input"
+                      placeholder="Verify with password"
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <span 
+                      className="material-symbols-outlined"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        color: 'var(--color-kensan-light_gray)',
+                        fontSize: '20px',
+                        userSelect: 'none'
+                      }}
+                    >
+                      {showCurrentPassword ? 'visibility' : 'visibility_off'}
+                    </span>
+                  </div>
                 </div>
                 <button
                   onClick={() => handleUpdateProfile('name')}
@@ -285,13 +325,32 @@ export const AccountSettings: React.FC = () => {
                 </div>
                 <div className="kensan-form-group">
                   <label>Current Password</label>
-                  <input
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="kensan-input"
-                    placeholder="Verify with password"
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="kensan-input"
+                      placeholder="Verify with password"
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <span 
+                      className="material-symbols-outlined"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        color: 'var(--color-kensan-light_gray)',
+                        fontSize: '20px',
+                        userSelect: 'none'
+                      }}
+                    >
+                      {showCurrentPassword ? 'visibility' : 'visibility_off'}
+                    </span>
+                  </div>
                 </div>
                 <button
                   onClick={() => handleUpdateProfile('email')}
@@ -307,33 +366,90 @@ export const AccountSettings: React.FC = () => {
                 <h2 className="kensan-settings-section-title">Change Password</h2>
                 <div className="kensan-form-group">
                   <label>Current Password</label>
-                  <input
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="kensan-input"
-                    placeholder="Current password"
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="kensan-input"
+                      placeholder="Current password"
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <span 
+                      className="material-symbols-outlined"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        color: 'var(--color-kensan-light_gray)',
+                        fontSize: '20px',
+                        userSelect: 'none'
+                      }}
+                    >
+                      {showCurrentPassword ? 'visibility' : 'visibility_off'}
+                    </span>
+                  </div>
                 </div>
                 <div className="kensan-form-group">
                   <label>New Password</label>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="kensan-input"
-                    placeholder="New password"
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="kensan-input"
+                      placeholder="New password"
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <span 
+                      className="material-symbols-outlined"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        color: 'var(--color-kensan-light_gray)',
+                        fontSize: '20px',
+                        userSelect: 'none'
+                      }}
+                    >
+                      {showNewPassword ? 'visibility' : 'visibility_off'}
+                    </span>
+                  </div>
                 </div>
                 <div className="kensan-form-group">
                   <label>Confirm New Password</label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="kensan-input"
-                    placeholder="Confirm password"
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="kensan-input"
+                      placeholder="Confirm password"
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <span 
+                      className="material-symbols-outlined"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        color: 'var(--color-kensan-light_gray)',
+                        fontSize: '20px',
+                        userSelect: 'none'
+                      }}
+                    >
+                      {showConfirmPassword ? 'visibility' : 'visibility_off'}
+                    </span>
+                  </div>
                 </div>
                 <button
                   onClick={() => handleUpdateProfile('password')}
