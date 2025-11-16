@@ -47,9 +47,13 @@ export function updateUserProfile(userId: number, data: UpdateProfileData): User
 
   // Update password (if provided)
   if (data.password) {
+    console.log('Updating password for user:', userId);
+    console.log('New password (plain):', data.password);
     const hashedPassword = bcrypt.hashSync(data.password, SALT_ROUNDS);
+    console.log('Hashed password:', hashedPassword);
     const stmt = db.prepare('UPDATE users SET password = ? WHERE id = ?');
-    stmt.run(hashedPassword, userId);
+    const result = stmt.run(hashedPassword, userId);
+    console.log('Password update result:', result);
   }
 
   // Get updated user

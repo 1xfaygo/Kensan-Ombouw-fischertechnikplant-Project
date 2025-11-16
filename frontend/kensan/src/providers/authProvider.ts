@@ -94,6 +94,20 @@ export const authProvider: AuthProvider = {
   },
 
   getIdentity: async () => {
+    try {
+      // Always fetch from backend to get latest data
+      const { data } = await axios.get(`${API_URL}/auth/me`);
+      
+      if (data.success && data.user) {
+        // Update localStorage with latest user data
+        localStorage.setItem("user", JSON.stringify(data.user));
+        return data.user;
+      }
+    } catch (error) {
+      console.error('Failed to fetch identity:', error);
+    }
+    
+    // Fallback to localStorage if API call fails
     const user = localStorage.getItem("user");
     if (user) {
       return JSON.parse(user);

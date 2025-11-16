@@ -10,14 +10,26 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
   const [activeItem, setActiveItem] = useState(initialActiveItem);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showLogoutMenu, setShowLogoutMenu] = useState<boolean | 'closing'>(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   
   const { mutate: logout } = useLogout();
-  const { data: identity } = useGetIdentity();
+  const { data: identity, refetch } = useGetIdentity();
   const navigate = useNavigate();
   
   const username = identity?.name || identity?.email?.split('@')[0] || 'Guest';
   const profilePicture = identity?.profile_picture;
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Listen for profile updates
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      refetch();
+      setRefreshKey(prev => prev + 1);
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+    return () => window.removeEventListener('profileUpdated', handleProfileUpdate);
+  }, [refetch]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -63,7 +75,10 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
           icon="dashboard"
           label="Dashboard"
           isActive={activeItem === 'dashboard'}
-          onClick={() => setActiveItem('dashboard')}
+          onClick={() => {
+            setActiveItem('dashboard');
+            navigate('/');
+          }}
         />
         <MenuItem 
           icon="shelves"
@@ -85,9 +100,9 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
         />
         <MenuItem 
           icon="file_save"
-          label="Documentatie"
-          isActive={activeItem === 'documentatie'}
-          onClick={() => setActiveItem('documentatie')}
+          label="Documentation"
+          isActive={activeItem === 'documentation'}
+          onClick={() => setActiveItem('documentation')}
         />
       </nav>
 
@@ -112,7 +127,10 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
           <div className="kensan-user-icon">
             {profilePicture ? (
               <img 
-                src={`http://localhost:3000${profilePicture}`} 
+                src={profilePicture.startsWith('http') 
+                  ? profilePicture 
+                  : `http://localhost:3000/profile_pictures/${profilePicture}`
+                } 
                 alt="Profile" 
                 style={{
                   width: '100%',

@@ -237,13 +237,15 @@ app.listen(PORT, () => {
 app.put('/api/profile/update', verifyToken, (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
-    const { name, email, currentPassword, newPassword } = req.body;
+    const { name, email, currentPassword, password } = req.body;
+
+    console.log('Profile update request:', { userId, name, email, hasCurrentPassword: !!currentPassword, hasPassword: !!password });
 
     const updatedUser = updateUserProfile(userId, {
       name,
       email,
       currentPassword,
-      newPassword
+      password
     });
 
     res.json({
@@ -251,6 +253,7 @@ app.put('/api/profile/update', verifyToken, (req: Request, res: Response) => {
       user: updatedUser
     });
   } catch (error: any) {
+    console.error('Profile update error:', error.message);
     res.status(400).json({
       success: false,
       message: error.message
@@ -284,8 +287,8 @@ app.post('/api/profile/upload-picture', verifyToken, upload.single('profilePictu
 
     res.json({
       success: true,
-      user,
-      profilePictureUrl: `/profile_pictures/${filename}`
+      profile_picture: `/profile_pictures/${filename}`,
+      user
     });
   } catch (error: any) {
     res.status(500).json({

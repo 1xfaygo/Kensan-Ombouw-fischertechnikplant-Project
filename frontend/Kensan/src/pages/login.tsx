@@ -97,7 +97,7 @@ export const Login: React.FC = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="your@kensan.nl"
                 className="kensan-login-input"
               />
             </div>
