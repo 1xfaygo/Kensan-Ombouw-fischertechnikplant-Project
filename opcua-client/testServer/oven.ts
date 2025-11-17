@@ -18,7 +18,14 @@ export function createOvenObject(namespace: Namespace) {
             get: () => new Variant({ dataType: DataType.Boolean, value: ovenRunning }),
             set: (variant) => {
                 ovenRunning = variant.value;
-                console.log(`Oven running state set to ${variant.value}`);
+                console.log(`Oven running`);
+
+                if (ovenRunning) {
+                    setTimeout(() => {
+                        ovenRunning = false;
+                        console.log(`Oven finished`);
+                    }, 5000);
+                }
                 return StatusCodes.Good;
             }
         }
