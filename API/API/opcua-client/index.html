@@ -7,8 +7,9 @@
 </head>
 <body>
     
- <div>Oven temperatuur: <span id="ovenTemp"></span></div>
-<div>Kraan positie: <span id="cranePos"></span></div>
+
+ <h3>Volledige JSON:</h3>
+ <pre id="rawJson"></pre>
    
 </body>
 <script>
@@ -18,10 +19,9 @@ async function fetchAllData() {
     const data = await res.json();
     console.log(data);
 
-    // Voorbeeld: update je pagina
-    document.getElementById("ovenTemp").innerText = data.ovenTemperature;
-    document.getElementById("cranePos").innerText = data.cranePosition;
-    // enzovoort voor alle nodes
+ 
+    // Volledige JSON tonen
+    document.getElementById("rawJson").innerText = JSON.stringify(data, null, 2);
   } catch (err) {
     console.error("Fout bij ophalen van data:", err);
   }

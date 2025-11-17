@@ -2,9 +2,10 @@
   "name": "opcua-project",
   "version": "1.0.0",
  "scripts": {
-  "start:server": "ts-node src/testServer/server.ts",
-  "start:api": "ts-node src/backend/api.ts"
-  },
+   "start:server": "ts-node testServer.ts",
+   "start:api": "ts-node backend/api.ts",
+   "start:all": "concurrently \"npm run start:server\" \"npm run start:api\""
+ },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",

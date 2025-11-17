@@ -1,6 +1,6 @@
 import { OPCUAClient, AttributeIds, DataType, WriteValueOptions } from "node-opcua";
 
-const endpointUrl = "opc.tcp://PC:4840/UA/TestServer";
+const endpointUrl = "opc.tcp://localhost:4840/UA/TestServer";
 
 async function testClient() {
   const client = OPCUAClient.create({});
