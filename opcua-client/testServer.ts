@@ -1,4 +1,8 @@
-import { OPCUAServer, Variant, DataType } from "node-opcua";
+import { OPCUAServer } from "node-opcua";
+import { createCraneObject } from "./testServer/crane";
+import { createWarehouseObject } from "./testServer/warehouse";
+import { createOvenObject } from "./testServer/oven";
+import { createConveyerbeltObject } from "./testServer/conveyerbelt";
 
 async function start() {
     const server = new OPCUAServer({
@@ -13,10 +17,14 @@ async function start() {
     const addressSpace = server.engine.addressSpace!;
     const namespace = addressSpace.getOwnNamespace();
 
+    createCraneObject(namespace);
+    createWarehouseObject(namespace);
+    createOvenObject(namespace);
+    createConveyerbeltObject(namespace);
+
     await server.start();
-    console.log("Simple OPC UA Server Running");
+    console.log("Test OPC UA Server Running");
     console.log("Endpoint:", server.getEndpointUrl());
-    console.log("NodeId to test: ns=1;s=MyNumber");
 }
 
 start();
