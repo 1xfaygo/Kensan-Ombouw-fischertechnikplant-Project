@@ -12,20 +12,17 @@ export class Crane extends BaseModel {
     async pickUp() {
         await this.write("PickUp", true, DataType.Boolean);
         await this.start();
-        await this.waitForFinish();
     }
 
     async drop() {
         await this.write("Drop", true, DataType.Boolean);
         await this.start();
-        await this.waitForFinish();
     }
 
     async moveTo(position: number) {
         await this.setLocation(position);
         console.log(`Crane moving to position ${position}.`);
         await this.start();
-        await this.waitForFinish();
     }
 
     async moveAndPickUp([pickPos, dropPos]: number[]) {

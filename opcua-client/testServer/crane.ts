@@ -19,12 +19,12 @@ export function createCraneObject(namespace: Namespace) {
             get: () => new Variant({ dataType: DataType.Boolean, value: craneRunning }),
             set: (variant) => {
                 craneRunning = variant.value;
-                console.log(`Crane running state set to ${variant.value}`);
+                console.log(`Crane started`);
 
                 if (craneRunning) {
                     setTimeout(() => {
                         craneRunning = false;
-                        console.log(`Crane finished moving to position ${cranePos}`);
+                        console.log(`Crane finished`);
                     }, 2000);
                 }
                 return StatusCodes.Good;

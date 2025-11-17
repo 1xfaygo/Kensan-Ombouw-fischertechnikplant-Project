@@ -17,7 +17,6 @@ async function start() {
     const addressSpace = server.engine.addressSpace!;
     const namespace = addressSpace.getOwnNamespace();
 
-    // Create all objects
     createCraneObject(namespace);
     createWarehouseObject(namespace);
     createOvenObject(namespace);

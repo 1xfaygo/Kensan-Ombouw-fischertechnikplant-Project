@@ -18,7 +18,14 @@ export function createConveyerbeltObject(namespace: Namespace) {
             get: () => new Variant({ dataType: DataType.Boolean, value: conveyerRunning }),
             set: (variant) => {
                 conveyerRunning = variant.value;
-                console.log(`Conveyerbelt running state set to ${variant.value}`);
+                console.log(`Conveyerbelt started`);
+
+                if (conveyerRunning) {
+                    setTimeout(() => {
+                        conveyerRunning = false;
+                        console.log(`Conveyerbelt finished`);
+                    }, 5000);
+                }
                 return StatusCodes.Good;
             }
         }

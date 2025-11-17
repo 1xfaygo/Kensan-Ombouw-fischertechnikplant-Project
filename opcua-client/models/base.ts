@@ -37,6 +37,7 @@ export class BaseModel {
         if (await this.isRunning()) { console.log(`${this.name} is already running.`); return; }
         await this.setRunning(true);
         console.log(`${this.name} started.`);
+        await this.waitForFinish();
     }
 
     async stop() {
