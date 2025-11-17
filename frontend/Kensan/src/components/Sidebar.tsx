@@ -99,6 +99,15 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
           onClick={() => setActiveItem('coming2')}
         />
         <MenuItem 
+          icon="person_add"
+          label="Create Account"
+          isActive={activeItem === 'create-account'}
+          onClick={() => {
+            setActiveItem('create-account');
+            navigate('/create-account');
+          }}
+        />
+        <MenuItem 
           icon="file_save"
           label="Documentation"
           isActive={activeItem === 'documentation'}

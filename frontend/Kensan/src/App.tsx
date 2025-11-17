@@ -7,6 +7,7 @@ import { authProvider } from "./providers/authProvider";
 import Dashboard from "./pages/dashboard";
 import { Login } from "./pages/login";
 import { AccountSettings } from "./pages/settings";
+import { CreateAccount } from "./pages/create-account";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           >
             <Route path="/" element={<Dashboard />} />
             <Route path="/settings" element={<AccountSettings />} />
+            <Route path="/create-account" element={<CreateAccount />} />
           </Route>
 
           <Route
