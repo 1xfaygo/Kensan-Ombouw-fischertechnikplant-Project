@@ -8,7 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { verifyUser, getUserById, initDefaultUser, createUser, deleteUserByEmail } from './auth.js';
-import { updateUserProfile, updateProfilePicture, deleteProfilePicture } from './profile.js';
+import { updateUserProfile, updateProfilePicture, deleteProfilePicture, deleteUserAccount } from './profile.js';
 import type { JWTPayload } from './types.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -298,6 +298,50 @@ app.post('/api/profile/upload-picture', verifyToken, upload.single('profilePictu
   }
 });
 
+app.post('/api/profile/upload-picture-for-user', verifyToken, upload.single('profilePicture'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
+      });
+    }
+
+    const targetUserId = parseInt(req.body.userId);
+    if (!targetUserId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    const filename = `${targetUserId}-${Date.now()}.jpg`;
+    const filepath = path.join(UPLOAD_DIR, filename);
+
+    // Resize and convert to JPEG
+    await sharp(req.file.buffer)
+      .resize(512, 512, { fit: 'cover' })
+      .jpeg({ quality: 90 })
+      .toFile(filepath);
+
+    // Update database
+    updateProfilePicture(targetUserId, filename);
+
+    const user = getUserById(targetUserId);
+
+    res.json({
+      success: true,
+      profile_picture: `/profile_pictures/${filename}`,
+      user
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to upload picture'
+    });
+  }
+});
+
 app.delete('/api/profile/delete-picture', verifyToken, (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
@@ -314,6 +358,35 @@ app.delete('/api/profile/delete-picture', verifyToken, (req: Request, res: Respo
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to delete picture'
+    });
+  }
+});
+
+app.delete('/api/profile/delete-account', verifyToken, (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password is required'
+      });
+    }
+
+    deleteUserAccount(userId, password);
+
+    // Clear auth cookie
+    res.clearCookie('auth_token');
+
+    res.json({
+      success: true,
+      message: 'Account deleted successfully'
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Failed to delete account'
     });
   }
 });

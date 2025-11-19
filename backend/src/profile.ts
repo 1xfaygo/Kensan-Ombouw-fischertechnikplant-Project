@@ -91,3 +91,31 @@ export function deleteProfilePicture(userId: number): void {
   const stmt = db.prepare('UPDATE users SET profile_picture = NULL WHERE id = ?');
   stmt.run(userId);
 }
+
+export function deleteUserAccount(userId: number, password: string): boolean {
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as User | undefined;
+  
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Verify password
+  const isValid = bcrypt.compareSync(password, user.password);
+  if (!isValid) {
+    throw new Error('Incorrect password');
+  }
+
+  // Delete profile picture if exists
+  if (user.profile_picture) {
+    const picturePath = path.join(__dirname, '../profile_pictures', user.profile_picture);
+    if (fs.existsSync(picturePath)) {
+      fs.unlinkSync(picturePath);
+    }
+  }
+
+  // Delete user from database
+  const stmt = db.prepare('DELETE FROM users WHERE id = ?');
+  const result = stmt.run(userId);
+  
+  return result.changes > 0;
+}

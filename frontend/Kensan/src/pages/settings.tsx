@@ -25,6 +25,10 @@ export const AccountSettings: React.FC = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
+  const [deletePassword, setDeletePassword] = useState("");
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -180,6 +184,36 @@ export const AccountSettings: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.response?.data?.message || `Failed to update ${field}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      setError("Password is required to delete your account");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      await axios.delete(
+        "http://localhost:3000/api/profile/delete-account",
+        {
+          data: { password: deletePassword },
+          withCredentials: true,
+        }
+      );
+
+      setSuccessMessage("Account deleted successfully. Logging out...");
+      setTimeout(() => {
+        logout();
+      }, 2000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to delete account");
     } finally {
       setIsLoading(false);
     }
@@ -458,6 +492,74 @@ export const AccountSettings: React.FC = () => {
                 >
                   Update Password
                 </button>
+              </div>
+
+              {/* Delete Account Section */}
+              <div className="kensan-settings-card" style={{ gridColumn: '1 / -1', maxWidth: '600px', borderColor: 'var(--color-kensan-power-off)' }}>
+                <h2 className="kensan-settings-section-title" style={{ color: 'var(--color-kensan-power-off)' }}>Delete Account</h2>
+                <p style={{ color: 'var(--color-kensan-light_gray)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                  ⚠️ Warning: This action is permanent and cannot be undone.
+                </p>
+                
+                {!showDeleteConfirm ? (
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="kensan-btn kensan-btn-danger"
+                  >
+                    Delete My Account
+                  </button>
+                ) : (
+                  <div>
+                    <div className="kensan-form-group">
+                      <label>Confirm Password to Delete Account</label>
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          type={showDeletePassword ? "text" : "password"}
+                          value={deletePassword}
+                          onChange={(e) => setDeletePassword(e.target.value)}
+                          className="kensan-input"
+                          placeholder="Enter your password"
+                          style={{ paddingRight: '45px' }}
+                        />
+                        <span 
+                          className="material-symbols-outlined"
+                          onClick={() => setShowDeletePassword(!showDeletePassword)}
+                          style={{
+                            position: 'absolute',
+                            right: '12px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            cursor: 'pointer',
+                            color: 'var(--color-kensan-light_gray)',
+                            fontSize: '20px',
+                            userSelect: 'none'
+                          }}
+                        >
+                          {showDeletePassword ? 'visibility' : 'visibility_off'}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button
+                        onClick={handleDeleteAccount}
+                        disabled={isLoading}
+                        className="kensan-btn kensan-btn-danger"
+                      >
+                        {isLoading ? "Deleting..." : "Confirm Delete"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowDeleteConfirm(false);
+                          setDeletePassword("");
+                        }}
+                        disabled={isLoading}
+                        className="kensan-btn kensan-btn-secondary"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
