@@ -1,5 +1,5 @@
 import { useLogin } from "@refinedev/core";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import "../kensan.css";
 import "../login.css";
@@ -13,7 +13,20 @@ export const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('kensan-theme');
+    return saved === 'dark' || saved === null;
+  });
+
+  // Initialize theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('kensan-theme');
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light-mode');
+    } else {
+      document.documentElement.classList.remove('light-mode');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,11 +60,17 @@ export const Login: React.FC = () => {
   };
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    if (!isDarkMode) {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    
+    if (newMode) {
+      // Dark mode
       document.documentElement.classList.remove("light-mode");
+      localStorage.setItem('kensan-theme', 'dark');
     } else {
+      // Light mode
       document.documentElement.classList.add("light-mode");
+      localStorage.setItem('kensan-theme', 'light');
     }
   };
 

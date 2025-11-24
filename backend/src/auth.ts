@@ -6,12 +6,13 @@ const SALT_ROUNDS = 10;
 
 export function createUser(email: string, password: string, name: string, role: string = 'user'): number {
   const hashedPassword = bcrypt.hashSync(password, SALT_ROUNDS);
+  const normalizedEmail = email.toLowerCase();
   
   try {
     const stmt = db.prepare(
       'INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)'
     );
-    const result = stmt.run(email, hashedPassword, name, role);
+    const result = stmt.run(normalizedEmail, hashedPassword, name, role);
     return Number(result.lastInsertRowid);
   } catch (error: any) {
     if (error.code === 'SQLITE_CONSTRAINT') {
@@ -22,10 +23,11 @@ export function createUser(email: string, password: string, name: string, role: 
 }
 
 export function verifyUser(email: string, password: string): UserWithoutPassword | null {
+  const normalizedEmail = email.toLowerCase();
   const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
-  const user = stmt.get(email) as User | undefined;
+  const user = stmt.get(normalizedEmail) as User | undefined;
   
-  console.log('Verifying user:', email, 'Found:', !!user);
+  console.log('Verifying user:', normalizedEmail, 'Found:', !!user);
   
   if (!user) {
     console.log('User not found in database');
@@ -56,8 +58,9 @@ export function getAllUsers(): UserWithoutPassword[] {
 }
 
 export function deleteUserByEmail(email: string): boolean {
+  const normalizedEmail = email.toLowerCase();
   const stmt = db.prepare('DELETE FROM users WHERE email = ?');
-  const result = stmt.run(email);
+  const result = stmt.run(normalizedEmail);
   
   if (result.changes === 0) {
     throw new Error('User not found');

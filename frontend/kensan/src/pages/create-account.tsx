@@ -142,7 +142,7 @@ export const CreateAccount: React.FC = () => {
                           <span className="material-symbols-outlined">person</span>
                         )}
                       </div>
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
                         <input
                           type="file"
                           accept="image/*"
@@ -153,7 +153,14 @@ export const CreateAccount: React.FC = () => {
                         <label 
                           htmlFor="create-account-picture-input" 
                           className="kensan-btn kensan-btn-secondary"
-                          style={{ width: '100%', display: 'inline-block', textAlign: 'center' }}
+                          style={{ 
+                            width: '100%', 
+                            display: 'inline-block', 
+                            textAlign: 'center',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
                         >
                           {selectedFile ? "Change Picture" : "Select Picture"}
                         </label>
@@ -161,7 +168,12 @@ export const CreateAccount: React.FC = () => {
                           <p style={{ 
                             marginTop: '0.5rem', 
                             fontSize: '0.85rem', 
-                            color: 'var(--color-kensan-light_gray)' 
+                            color: 'var(--color-kensan-light_gray)',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: '100%',
+                            margin: '0.5rem 0 0 0'
                           }}>
                             {selectedFile.name}
                           </p>
