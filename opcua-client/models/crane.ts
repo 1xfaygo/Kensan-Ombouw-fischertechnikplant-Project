@@ -1,20 +1,36 @@
 import { DataType, ClientSession } from "node-opcua";
 import { BaseModel } from "./base";
 
-export class CraneModel extends BaseModel {
+export class Crane extends BaseModel {
     constructor(session: ClientSession, ns: number) {
         super(session, ns, "Crane");
     }
 
-    async getCoords() { return this.read("Coords"); }
-    async setCoords(value: number) { return this.write("Coords", value, DataType.Int16); }
+    async getLocation() { return this.read("Location"); }
+    async setLocation(value: number) { return this.write("Location", value, DataType.Int16); }
 
-    async isRunning() { return this.read("Running"); }
-    async setRunning(value: boolean) { return this.write("Running", value, DataType.Boolean); }
+    async pickUp() {
+        await this.write("PickUp", true, DataType.Boolean);
+        await this.start();
+    }
 
+    async drop() {
+        await this.write("Drop", true, DataType.Boolean);
+        await this.start();
+    }
 
-    async stop() {
-        await this.setRunning(false);
-        console.log("Crane stopped.");
+    async moveTo(position: number) {
+        await this.setLocation(position);
+        console.log(`Crane moving to position ${position}.`);
+        await this.start();
+    }
+
+    async moveAndPickUp([pickPos, dropPos]: number[]) {
+        await this.moveTo(pickPos);
+        console.log(`Crane picking up item at position ${pickPos}.`);
+        await this.pickUp();
+        await this.moveTo(dropPos);
+        console.log(`Crane dropping item at position ${dropPos}.`);
+        await this.drop();
     }
 }
