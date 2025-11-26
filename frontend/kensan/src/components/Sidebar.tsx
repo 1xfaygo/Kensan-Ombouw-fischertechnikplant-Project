@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLogout, useGetIdentity } from '@refinedev/core';
 import { useNavigate } from 'react-router';
+import '../kensan.css';
 
 interface SidebarProps {
   activeItem?: string;
@@ -14,6 +15,9 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
   });
   const [showLogoutMenu, setShowLogoutMenu] = useState<boolean | 'closing'>(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  
+  // Logo path based on theme
+  const logoSrc = isDarkMode ? '/logo_dark.png' : '/logo_light.png';
   
   const { mutate: logout } = useLogout();
   const { data: identity, refetch } = useGetIdentity();
@@ -79,9 +83,9 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
 
   return (
     <div className="kensan-sidebar">
-      <div style={{ padding: '0 0.5rem 1rem' }}>
+      <div style={{ padding: '10px 0.5rem 1rem' }}>
         <img 
-          src="/logo.png" 
+          src={logoSrc} 
           alt="Kensan Logo" 
           className="kensan-sidebar-logo"
         />
@@ -207,7 +211,7 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
                   padding: '0.75rem 1rem',
                   backgroundColor: 'transparent',
                   border: 'none',
-                  color: 'var(--color-kensan-white)',
+                  color: 'var(--color-cyberdefense-orange)',
                   fontSize: '0.9rem',
                   cursor: 'pointer',
                   display: 'flex',
@@ -237,7 +241,7 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
                   padding: '0.75rem 1rem',
                   backgroundColor: 'transparent',
                   border: 'none',
-                  color: 'var(--color-kensan-white)',
+                  color: 'var(--color-cyberdefense-orange)',
                   fontSize: '0.9rem',
                   cursor: 'pointer',
                   display: 'flex',

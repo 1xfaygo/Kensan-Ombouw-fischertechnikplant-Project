@@ -18,6 +18,9 @@ export const Login: React.FC = () => {
     return saved === 'dark' || saved === null;
   });
 
+  // Logo path based on theme
+  const logoSrc = isDarkMode ? '/logo_dark.png' : '/logo_light.png';
+
   // Initialize theme from localStorage on mount
   useEffect(() => {
     const savedTheme = localStorage.getItem('kensan-theme');
