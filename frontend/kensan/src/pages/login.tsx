@@ -96,7 +96,7 @@ export const Login: React.FC = () => {
       <div className="kensan-login-card">
         <div className="kensan-login-header">
           <img
-            src="/logo.png"
+            src={logoSrc}
             alt="Kensan Logo"
             className="kensan-login-logo"
           />
