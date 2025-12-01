@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLogout, useGetIdentity } from '@refinedev/core';
 import { useNavigate } from 'react-router';
+import '../kensan.css';
 
 interface SidebarProps {
   activeItem?: string;
@@ -8,9 +9,15 @@ interface SidebarProps {
 
 function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) {
   const [activeItem, setActiveItem] = useState(initialActiveItem);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('kensan-theme');
+    return saved === 'dark' || saved === null;
+  });
   const [showLogoutMenu, setShowLogoutMenu] = useState<boolean | 'closing'>(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  
+  // Logo path based on theme
+  const logoSrc = isDarkMode ? '/logo_dark.png' : '/logo_light.png';
   
   const { mutate: logout } = useLogout();
   const { data: identity, refetch } = useGetIdentity();
@@ -19,6 +26,16 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
   const username = identity?.name || identity?.email?.split('@')[0] || 'Guest';
   const profilePicture = identity?.profile_picture;
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Initialize theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('kensan-theme');
+    if (savedTheme === 'light') {
+      document.documentElement.classList.add('light-mode');
+    } else {
+      document.documentElement.classList.remove('light-mode');
+    }
+  }, []);
 
   // Listen for profile updates
   useEffect(() => {
@@ -50,19 +67,25 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
   }, [showLogoutMenu]);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    if (!isDarkMode) {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    
+    if (newMode) {
+      // Dark mode
       document.documentElement.classList.remove('light-mode');
+      localStorage.setItem('kensan-theme', 'dark');
     } else {
+      // Light mode
       document.documentElement.classList.add('light-mode');
+      localStorage.setItem('kensan-theme', 'light');
     }
   };
 
   return (
     <div className="kensan-sidebar">
-      <div style={{ padding: '0 0.5rem 1rem' }}>
+      <div style={{ padding: '10px 0.5rem 1rem' }}>
         <img 
-          src="/logo.png" 
+          src={logoSrc} 
           alt="Kensan Logo" 
           className="kensan-sidebar-logo"
         />
@@ -188,7 +211,7 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
                   padding: '0.75rem 1rem',
                   backgroundColor: 'transparent',
                   border: 'none',
-                  color: 'var(--color-kensan-white)',
+                  color: 'var(--color-cyberdefense-orange)',
                   fontSize: '0.9rem',
                   cursor: 'pointer',
                   display: 'flex',
@@ -218,7 +241,7 @@ function Sidebar({ activeItem: initialActiveItem = 'dashboard' }: SidebarProps) 
                   padding: '0.75rem 1rem',
                   backgroundColor: 'transparent',
                   border: 'none',
-                  color: 'var(--color-kensan-white)',
+                  color: 'var(--color-cyberdefense-orange)',
                   fontSize: '0.9rem',
                   cursor: 'pointer',
                   display: 'flex',
