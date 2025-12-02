@@ -30,24 +30,48 @@ export class BaseModel {
         });
     }
 
-    async isRunning() { return this.read("Running"); }
-    async setRunning(value: boolean) { return this.write("Running", value, DataType.Boolean); }
+
+    // status
+
+
+    getReady() {
+        return this.read("Status.Ready");
+    }
+
+    getError(): Promise<Error> {
+        return this.read("Status.Error");
+    }
+
+    getErrorString() {
+        return this.read("Status.Error_str");
+    }
+
+
+    //controls
+
 
     async start() {
-        if (await this.isRunning()) { console.log(`${this.name} is already running.`); return; }
-        await this.setRunning(true);
-        console.log(`${this.name} started.`);
-        await this.waitForFinish();
+        await this.write("Control.Start", true, DataType.Boolean);
     }
 
     async stop() {
-        if (!(await this.isRunning())) { console.log(`${this.name} is already stopped.`); return; }
-        await this.setRunning(false);
-        console.log(`${this.name} stopped.`);
+        await this.write("Control.Stop", true, DataType.Boolean);
+    }
+
+    async forceStop() {
+        await this.write("Control.Force_stop", true, DataType.Boolean);
+    }
+
+    async resetError() {
+        await this.write("Control.Reset_error", true, DataType.Boolean);
+    }
+
+    async calibrate() {
+        await this.write("Control.Calibrate", true, DataType.Boolean);
     }
 
     async waitForFinish() {
-        while (await this.isRunning()) {
+        while (!await this.getReady()) {
             await new Promise(res => setTimeout(res, 200));
         }
     }

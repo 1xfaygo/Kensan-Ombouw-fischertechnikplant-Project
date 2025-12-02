@@ -13,3 +13,8 @@ export enum WarehouseActions {
     Take = 0, // Haal een blokje op uit het magazijn
     Store = 1 // Plaats een blokje terug in het magazijn.
 }
+
+export interface Destination {
+    row: number;
+    col: number;
+}
