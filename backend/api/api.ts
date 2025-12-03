@@ -4,7 +4,11 @@ import cors from "cors";
 import { connectToOpcServer, readAllNodes, readNodeValue, writeNodeValue, nodeMap } from "./opcClient";
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
+
 app.use(express.json());
 
 // Connect OPC UA
