@@ -46,4 +46,4 @@ app.post("/api/write", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("🚀 API draait op http://localhost:3000"));
+app.listen(3001, () => console.log("🚀 API draait op http://localhost:3001"));

@@ -8,7 +8,7 @@ let client: OPCUAClient;
 let session: ClientSession;
 
 export async function connectToOpcServer() {
-  client = OPCUAClient.create({ endpoint_must_exist: false });
+  client = OPCUAClient.create({ endpointMustExist: false });
   await client.connect(endpointUrl);
   session = await client.createSession();
   console.log("✅ Verbonden met OPC UA-server:", endpointUrl);
