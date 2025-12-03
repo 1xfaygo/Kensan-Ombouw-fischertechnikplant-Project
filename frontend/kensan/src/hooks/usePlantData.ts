@@ -46,7 +46,7 @@ export const usePlantData = () => {
     const fetchData = async () => {
       try {
         // First, try to fetch from the API
-        const response = await axios.get(`${API_URL}/api/plant-data`, {
+        const response = await axios.get(`${API_URL}/api/all`, {
           timeout: 3000, // 3 second timeout
         });
         
