@@ -5,7 +5,7 @@ import { Oven } from "./models/oven";
 import { Warehouse } from "./models/warehouse";
 
 async function main() {
-    const endpoint = "opc.tcp://localhost:4840/UA/TestServer";
+    const endpoint = "opc.tcp://localhost:4840/UA/TestServer/GVL/Interface";
     const client = OPCUAClient.create({ endpointMustExist: false });
 
     try {
@@ -20,12 +20,22 @@ async function main() {
         const oven = new Oven(session, ns);
         const warehouse = new Warehouse(session, ns);
 
-        await warehouse.getBox([3, 3]);
-        await crane.moveAndPickUp([0, 1]);
-        await oven.start();
-        await conveyerBelt.start();
-        await crane.moveAndPickUp([2, 0]);
-        await warehouse.storeBox([3, 3]);
+        warehouse.calibrate();
+        crane.calibrate();
+        oven.calibrate();
+        conveyerBelt.calibrate();
+
+        warehouse.start();
+        crane.start();
+        oven.start();
+        conveyerBelt.start();
+
+        warehouse.writeAssignment([1, 1], 0);
+        crane.writeAssignment(3, 2);
+        oven.addQueue();
+        conveyerBelt.addQueue();
+        crane.writeAssignment(4, 3);
+        warehouse.writeAssignment([1, 1], 1);
 
         await session.close();
         console.log("Session closed");

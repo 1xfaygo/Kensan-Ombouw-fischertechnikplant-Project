@@ -40,7 +40,7 @@ const upload = multer({
 });
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
@@ -188,8 +188,13 @@ app.post('/api/auth/register', (req: Request, res: Response) => {
     });
   }
   
+  // Capitalize first letter of each word in name
+  const capitalizedName = name.split(' ').map((word: string) => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ');
+  
   try {
-    const userId = createUser(email, password, name);
+    const userId = createUser(email, password, capitalizedName);
     const user = getUserById(userId);
     
     res.status(201).json({
@@ -250,8 +255,13 @@ app.put('/api/profile/update', verifyToken, (req: Request, res: Response) => {
 
     console.log('Profile update request:', { userId, name, email, hasCurrentPassword: !!currentPassword, hasPassword: !!password });
 
+    // Capitalize first letter of each word in name if name is provided
+    const capitalizedName = name ? name.split(' ').map((word: string) => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ') : undefined;
+
     const updatedUser = updateUserProfile(userId, {
-      name,
+      name: capitalizedName,
       email,
       currentPassword,
       password

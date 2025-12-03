@@ -7,7 +7,7 @@ import { createConveyerbeltObject } from "./testServer/conveyerbelt";
 async function start() {
     const server = new OPCUAServer({
         port: 4840,
-        resourcePath: "/UA/TestServer",
+        resourcePath: "/UA/TestServer/GVL/Interface",
         buildInfo: {
             productName: "TestServer"
         }

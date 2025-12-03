@@ -7,8 +7,9 @@
 .kensan-settings-title {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--color-kensan-white);
+  color: var(--color-cyberdefense-orange);
   margin-bottom: 2rem;
+  transition: color 0.4s ease;
 }
 
 .kensan-settings-notification {
@@ -56,6 +57,7 @@
   border-radius: 10px;
   padding: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.4s ease;
 }
 
 .kensan-settings-section-title {
@@ -65,6 +67,7 @@
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid rgba(255,255,255,0.1);
+  transition: color 0.4s ease;
 }
 
 .kensan-profile-picture-section {
@@ -84,6 +87,7 @@
   justify-content: center;
   overflow: hidden;
   border: 3px solid var(--color-kensan-light_blue);
+  transition: background-color 0.4s ease;
 }
 
 .kensan-profile-picture-preview img {
@@ -95,6 +99,7 @@
 .kensan-profile-picture-preview .material-symbols-outlined {
   font-size: 80px;
   color: var(--color-kensan-light_gray);
+  transition: color 0.4s ease;
 }
 
 .kensan-profile-picture-actions {
@@ -114,6 +119,7 @@
   color: var(--color-kensan-white);
   font-size: 0.9rem;
   font-weight: 500;
+  
 }
 
 .kensan-input {
@@ -125,7 +131,7 @@
   color: var(--color-kensan-white);
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.3s ease;
 }
 
 .kensan-input:focus {
@@ -144,7 +150,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -169,10 +175,12 @@
 .kensan-btn-secondary {
   background-color: var(--color-kensan-gray);
   color: var(--color-kensan-white);
+  transition: background-color 0.4s ease, color 0.4s ease, transform 0.2s ease;
 }
 
 .kensan-btn-secondary:hover:not(:disabled) {
   background-color: rgba(255,255,255,0.1);
+  transform: translateY(-1px);
 }
 
 .kensan-btn-danger {
@@ -192,6 +200,7 @@
   padding: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
   max-width: 600px;
+  transition: background-color 0.4s ease;
 }
 
 .kensan-profile-picture-upload {
@@ -202,6 +211,8 @@
   background-color: var(--color-kensan-gray);
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.05);
+  overflow: hidden;
+  transition: background-color 0.4s ease;
 }
 
 .kensan-profile-picture-preview-small {
@@ -215,6 +226,7 @@
   overflow: hidden;
   border: 2px solid var(--color-kensan-light_blue);
   flex-shrink: 0;
+  transition: background-color 0.4s ease;
 }
 
 .kensan-profile-picture-preview-small img {
@@ -226,4 +238,5 @@
 .kensan-profile-picture-preview-small .material-symbols-outlined {
   font-size: 40px;
   color: var(--color-kensan-light_gray);
+  transition: color 0.4s ease;
 }
