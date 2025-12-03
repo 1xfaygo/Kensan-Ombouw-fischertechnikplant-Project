@@ -8,3 +8,13 @@ export enum CraneStatus {
     startup = 100, // Kraan is opgestart
     calibration = 200 // Kraan is gekalibreerd 
 }
+
+export enum CraneDestinations {
+    unknown = 0,
+    idle = 1,
+    oven = 2,
+    warehouse = 3,
+    sorter_left = 4,
+    sorter_mid = 5,
+    sorter_right = 6
+}
