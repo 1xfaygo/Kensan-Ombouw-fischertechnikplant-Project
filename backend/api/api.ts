@@ -8,6 +8,7 @@ app.use(cors({
   origin: true,
   credentials: true,
 }));
+
 app.use(express.json());
 
 // Connect OPC UA
