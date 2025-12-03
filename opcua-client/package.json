@@ -1,5 +1,7 @@
 {
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/controller.js",
     "server": "ts-node testServer.ts",
     "client": "ts-node controller.ts"
   },
