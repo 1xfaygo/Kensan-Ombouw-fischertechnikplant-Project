@@ -1,51 +1,47 @@
-import { OPCUAClient } from "node-opcua";
+import { ClientSession, OPCUAClient } from "node-opcua";
 import { Crane } from "./models/crane";
 import { Conveyerbelt } from "./models/conveyerbelt";
 import { Oven } from "./models/oven";
 import { Warehouse } from "./models/warehouse";
 
-async function main() {
-    const endpoint = "opc.tcp://localhost:4840/UA/TestServer/GVL/Interface";
-    const client = OPCUAClient.create({ endpointMustExist: false });
+class OPCUAController {
+    private client: OPCUAClient;
+    private session: ClientSession;
 
-    try {
-        await client.connect(endpoint);
+    public warehouse: Warehouse;
+    public crane: Crane;
+    public oven: Oven;
+    public conveyerBelt: Conveyerbelt;
+
+    private ns: 1;
+    private endpoint: string = "opc.tcp://localhost:4840/UA/TestServer/GVL/Interface";
+
+    public async connect() {
+        this.client = OPCUAClient.create({ endpointMustExist: false });
+        await this.client.connect(this.endpoint);
         console.log("Connected to OPC UA server");
 
-        const session = await client.createSession();
-        const ns = 1;
+        this.session = await this.client.createSession();
 
-        const crane = new Crane(session, ns)
-        const conveyerBelt = new Conveyerbelt(session, ns);
-        const oven = new Oven(session, ns);
-        const warehouse = new Warehouse(session, ns);
+        const crane = new Crane(this.session, this.ns);
+        const conveyerBelt = new Conveyerbelt(this.session, this.ns);
+        const oven = new Oven(this.session, this.ns);
+        const warehouse = new Warehouse(this.session, this.ns);
 
-        warehouse.calibrate();
-        crane.calibrate();
-        oven.calibrate();
-        conveyerBelt.calibrate();
+        await warehouse.calibrate();
+        await crane.calibrate();
+        await oven.calibrate();
+        await conveyerBelt.calibrate();
 
-        warehouse.start();
-        crane.start();
-        oven.start();
-        conveyerBelt.start();
+        console.log("Ready to move");
+    }
 
-        warehouse.writeAssignment([1, 1], 0);
-        crane.writeAssignment(3, 2);
-        oven.addQueue();
-        conveyerBelt.addQueue();
-        crane.writeAssignment(4, 3);
-        warehouse.writeAssignment([1, 1], 1);
-
-        await session.close();
+    public async disconnect() {
+        await this.session.close();
+        await this.client.disconnect();
         console.log("Session closed");
-
-    } catch (err) {
-        console.error("OPC UA Error:", err);
-    } finally {
-        await client.disconnect();
-        console.log("Disconnected from OPC UA server");
     }
 }
 
-main();
+
+export const opcuaController = new OPCUAController();
