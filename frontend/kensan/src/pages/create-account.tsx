@@ -32,6 +32,12 @@ export const CreateAccount: React.FC = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isLoading) {
+      handleCreateAccount(e as any);
+    }
+  };
+
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -188,6 +194,7 @@ export const CreateAccount: React.FC = () => {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      onKeyDown={handleKeyDown}
                       className="kensan-input"
                       placeholder="Hamza Bulut"
                       required
@@ -200,6 +207,7 @@ export const CreateAccount: React.FC = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      onKeyDown={handleKeyDown}
                       className="kensan-input"
                       placeholder="user@kensan.nl"
                       required
@@ -225,6 +233,7 @@ export const CreateAccount: React.FC = () => {
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={handleKeyDown}
                         className="kensan-input"
                         placeholder="••••••••"
                         style={{ paddingRight: '45px' }}
@@ -256,6 +265,7 @@ export const CreateAccount: React.FC = () => {
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        onKeyDown={handleKeyDown}
                         className="kensan-input"
                         placeholder="••••••••"
                         style={{ paddingRight: '45px' }}
