@@ -1,4 +1,4 @@
-export enum OvenStatus {
+export enum OvenStates {
     Idle = 0, // De oven is klaar om te starten.
     Doors_1 = 1, // De voorste deuren van de oven openen/sluiten.
     Action_1 = 2, // De oven heeft een blokje in de oven.

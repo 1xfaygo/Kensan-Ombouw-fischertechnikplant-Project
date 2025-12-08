@@ -1,4 +1,6 @@
 import { ClientSession, AttributeIds, DataType } from "node-opcua";
+import { BaseStatus } from "../enums/status";
+import { Error } from "../enums/error";
 
 export class BaseModel {
     protected session: ClientSession;
@@ -33,6 +35,13 @@ export class BaseModel {
 
     // status
 
+    async getStatus(): Promise<BaseStatus> {
+        return {
+            Ready: await this.getReady(),
+            Error: await this.getError(),
+            Error_str: await this.getErrorString()
+        }
+    }
 
     getReady() {
         return this.read("Status.Ready");

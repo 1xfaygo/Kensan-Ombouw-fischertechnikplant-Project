@@ -1,4 +1,4 @@
-export enum WarehouseStatus {
+export enum WarehouseStates {
     Idle = 0, // Het magazijn is klaar om te bewegen.
     Moving_1 = 1, // Het magazijn beweegt naar de startpositie.
     Action_1 = 2, // Het magazijn pakt het blokje op.

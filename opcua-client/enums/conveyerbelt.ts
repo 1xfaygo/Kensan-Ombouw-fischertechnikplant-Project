@@ -1,4 +1,4 @@
-export enum ConveyerStatus {
+export enum ConveyerStates {
     Idle = 0, // De loopband is klaar om te starten.
     Action_1 = 1, // De loopband heeft een blokje ontvangen en is gestart met bewegen.
     Action_2 = 2, // De loopband heeft een kleur gedetecteerd.

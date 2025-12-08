@@ -1,4 +1,4 @@
-export enum CraneStatus {
+export enum CraneStates {
     idle = 0, // Kraan is idle en klaar voor opdracht
     moving_1 = 1, // Kraan beweegt naar eerste punt
     grabbing = 2, // Kraan is op eerste punt en pakt blokje op
