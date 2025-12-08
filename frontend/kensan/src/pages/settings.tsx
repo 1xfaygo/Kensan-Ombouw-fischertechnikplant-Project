@@ -57,6 +57,30 @@ export const AccountSettings: React.FC = () => {
     }
   };
 
+  const handleKeyDownName = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isLoading) {
+      handleUpdateProfile('name');
+    }
+  };
+
+  const handleKeyDownEmail = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isLoading) {
+      handleUpdateProfile('email');
+    }
+  };
+
+  const handleKeyDownPassword = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isLoading) {
+      handleUpdateProfile('password');
+    }
+  };
+
+  const handleKeyDownDelete = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isLoading) {
+      handleDeleteAccount();
+    }
+  };
+
   const handleUploadPicture = async () => {
     if (!selectedFile) return;
 
@@ -302,6 +326,7 @@ export const AccountSettings: React.FC = () => {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    onKeyDown={handleKeyDownName}
                     className="kensan-input"
                     placeholder="Your name"
                   />
@@ -313,6 +338,7 @@ export const AccountSettings: React.FC = () => {
                       type={showCurrentPassword ? "text" : "password"}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
+                      onKeyDown={handleKeyDownName}
                       className="kensan-input"
                       placeholder="Verify with password"
                       style={{ paddingRight: '45px' }}
@@ -353,6 +379,7 @@ export const AccountSettings: React.FC = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={handleKeyDownEmail}
                     className="kensan-input"
                     placeholder="your.email@example.com"
                   />
@@ -364,6 +391,7 @@ export const AccountSettings: React.FC = () => {
                       type={showCurrentPassword ? "text" : "password"}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
+                      onKeyDown={handleKeyDownEmail}
                       className="kensan-input"
                       placeholder="Verify with password"
                       style={{ paddingRight: '45px' }}
@@ -405,6 +433,7 @@ export const AccountSettings: React.FC = () => {
                       type={showCurrentPassword ? "text" : "password"}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
+                      onKeyDown={handleKeyDownPassword}
                       className="kensan-input"
                       placeholder="Current password"
                       style={{ paddingRight: '45px' }}
@@ -434,6 +463,7 @@ export const AccountSettings: React.FC = () => {
                       type={showNewPassword ? "text" : "password"}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
+                      onKeyDown={handleKeyDownPassword}
                       className="kensan-input"
                       placeholder="New password"
                       style={{ paddingRight: '45px' }}
@@ -463,6 +493,7 @@ export const AccountSettings: React.FC = () => {
                       type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      onKeyDown={handleKeyDownPassword}
                       className="kensan-input"
                       placeholder="Confirm password"
                       style={{ paddingRight: '45px' }}
@@ -517,6 +548,7 @@ export const AccountSettings: React.FC = () => {
                           type={showDeletePassword ? "text" : "password"}
                           value={deletePassword}
                           onChange={(e) => setDeletePassword(e.target.value)}
+                          onKeyDown={handleKeyDownDelete}
                           className="kensan-input"
                           placeholder="Enter your password"
                           style={{ paddingRight: '45px' }}

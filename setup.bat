@@ -5,3 +5,7 @@ start cmd /k "npm run dev --host"
 
 cd /d "%~dp0backend"
 start cmd /k "npm run dev --host"
+
+cd /d "%~dp0backend"
+start cmd /k "npm run api --host"
+

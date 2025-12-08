@@ -233,6 +233,15 @@ app.post('/api/auth/deluser', (req: Request, res: Response) => {
   }
 });
 
+// Simple test endpoint for the frontend
+app.get('/api/test', (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    message: 'Hello from the API',
+    time: new Date().toISOString()
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Kensan Auth Server running on http://localhost:${PORT}`);
   console.log(`Default login: admin@kensan.nl / admin123`);
