@@ -26,6 +26,7 @@ export function createConveyerbeltObject(namespace: Namespace) {
         browseName: "Ready",
         nodeId: "ns=1;s=Conveyerbelt.Status.Ready",
         dataType: "Boolean",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Boolean, value: ready })
         }
@@ -36,6 +37,7 @@ export function createConveyerbeltObject(namespace: Namespace) {
         browseName: "Error",
         nodeId: "ns=1;s=Conveyerbelt.Status.Error",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: error })
         }
@@ -46,6 +48,7 @@ export function createConveyerbeltObject(namespace: Namespace) {
         browseName: "Error_str",
         nodeId: "ns=1;s=Conveyerbelt.Status.Error_str",
         dataType: "String",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.String, value: errorStr })
         }
@@ -56,6 +59,7 @@ export function createConveyerbeltObject(namespace: Namespace) {
         browseName: "State",
         nodeId: "ns=1;s=Conveyerbelt.Status.State",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: conveyerState })
         }
@@ -66,6 +70,7 @@ export function createConveyerbeltObject(namespace: Namespace) {
         browseName: "Color",
         nodeId: "ns=1;s=Conveyerbelt.Status.Color",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: color })
         }
@@ -76,6 +81,7 @@ export function createConveyerbeltObject(namespace: Namespace) {
         browseName: "Queue_length",
         nodeId: "ns=1;s=Conveyerbelt.Status.Queue_length",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: queueLength })
         }
@@ -86,6 +92,7 @@ export function createConveyerbeltObject(namespace: Namespace) {
         browseName: "assignment_in_queue",
         nodeId: "ns=1;s=Conveyerbelt.Status.Assignment_in_queue",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: assignmentInQueue })
         }

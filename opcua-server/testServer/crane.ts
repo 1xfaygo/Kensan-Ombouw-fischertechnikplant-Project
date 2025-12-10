@@ -28,6 +28,7 @@ export function createCraneObject(namespace: Namespace) {
         browseName: "Ready",
         nodeId: "ns=1;s=Crane.Status.Ready",
         dataType: "Boolean",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Boolean, value: ready })
         }
@@ -38,6 +39,7 @@ export function createCraneObject(namespace: Namespace) {
         browseName: "Error",
         nodeId: "ns=1;s=Crane.Status.Error",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: error })
         }
@@ -48,6 +50,7 @@ export function createCraneObject(namespace: Namespace) {
         browseName: "Error_str",
         nodeId: "ns=1;s=Crane.Status.Error_str",
         dataType: "String",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.String, value: errorStr })
         }
@@ -58,6 +61,7 @@ export function createCraneObject(namespace: Namespace) {
         browseName: "State",
         nodeId: "ns=1;s=Crane.Status.State",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: craneState })
         }
@@ -68,6 +72,7 @@ export function createCraneObject(namespace: Namespace) {
         browseName: "source",
         nodeId: "ns=1;s=Crane.Status.source",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: craneSource })
         }
@@ -78,6 +83,7 @@ export function createCraneObject(namespace: Namespace) {
         browseName: "destination",
         nodeId: "ns=1;s=Crane.Status.destination",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: craneDestination })
         }
@@ -88,6 +94,7 @@ export function createCraneObject(namespace: Namespace) {
         browseName: "Assignment_source",
         nodeId: "ns=1;s=Crane.Status.Assignment_source",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: assignmentSource })
         }
@@ -98,6 +105,7 @@ export function createCraneObject(namespace: Namespace) {
         browseName: "Assignment_destination",
         nodeId: "ns=1;s=Crane.Status.Assignment_destination",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: assignmentDestination })
         }

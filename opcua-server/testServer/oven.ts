@@ -25,6 +25,7 @@ export function createOvenObject(namespace: Namespace) {
         browseName: "Ready",
         nodeId: "ns=1;s=Oven.Status.Ready",
         dataType: "Boolean",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Boolean, value: ready })
         }
@@ -35,6 +36,7 @@ export function createOvenObject(namespace: Namespace) {
         browseName: "Error",
         nodeId: "ns=1;s=Oven.Status.Error",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: error })
         }
@@ -45,6 +47,7 @@ export function createOvenObject(namespace: Namespace) {
         browseName: "Error_str",
         nodeId: "ns=1;s=Oven.Status.Error_str",
         dataType: "String",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.String, value: errorStr })
         }
@@ -55,6 +58,7 @@ export function createOvenObject(namespace: Namespace) {
         browseName: "State",
         nodeId: "ns=1;s=Oven.Status.State",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: ovenState })
         }
@@ -65,6 +69,7 @@ export function createOvenObject(namespace: Namespace) {
         browseName: "Queue_length",
         nodeId: "ns=1;s=Oven.Status.Queue_length",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: queueLength })
         }
@@ -75,6 +80,7 @@ export function createOvenObject(namespace: Namespace) {
         browseName: "assignment_in_queue",
         nodeId: "ns=1;s=Oven.Status.Assignment_in_queue",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: assignmentInQueue })
         }

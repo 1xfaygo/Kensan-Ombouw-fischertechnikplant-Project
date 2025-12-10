@@ -30,6 +30,7 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "Ready",
         nodeId: "ns=1;s=Warehouse.Status.Ready",
         dataType: "Boolean",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Boolean, value: ready })
         }
@@ -39,7 +40,8 @@ export function createWarehouseObject(namespace: Namespace) {
         componentOf: warehouseStatus,
         browseName: "Error",
         nodeId: "ns=1;s=Warehouse.Status.Error",
-        dataType: "UInt16",
+        dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.UInt16, value: error })
         }
@@ -50,17 +52,18 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "ErrorString",
         nodeId: "ns=1;s=Warehouse.Status.ErrorString",
         dataType: "String",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.String, value: errorStr })
         }
     });
 
-    // Status.State
     namespace.addVariable({
         componentOf: warehouseStatus,
         browseName: "State",
         nodeId: "ns=1;s=Warehouse.Status.State",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: warehouseState })
         }
@@ -77,6 +80,7 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "row",
         nodeId: "ns=1;s=Warehouse.Status.Destination.row",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: destinationRow })
         }
@@ -87,6 +91,7 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "col",
         nodeId: "ns=1;s=Warehouse.Status.Destination.col",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: destinationCol })
         }
@@ -97,6 +102,7 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "Action",
         nodeId: "ns=1;s=Warehouse.Status.Action",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: action })
         }
@@ -113,6 +119,7 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "row",
         nodeId: "ns=1;s=Warehouse.Status.Assignment_destination.row",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: assignmentDestinationRow })
         }
@@ -123,6 +130,7 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "col",
         nodeId: "ns=1;s=Warehouse.Status.Assignment_destination.col",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: assignmentDestinationCol })
         }
@@ -133,6 +141,7 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "Assignment_action",
         nodeId: "ns=1;s=Warehouse.Status.Assignment_action",
         dataType: "Int16",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Int16, value: assignmentAction })
         }
@@ -143,6 +152,7 @@ export function createWarehouseObject(namespace: Namespace) {
         browseName: "Assignment_in_queue",
         nodeId: "ns=1;s=Warehouse.Status.Assignment_in_queue",
         dataType: "Boolean",
+        minimumSamplingInterval: 5000,
         value: {
             get: () => new Variant({ dataType: DataType.Boolean, value: assignmentInQueue })
         }
