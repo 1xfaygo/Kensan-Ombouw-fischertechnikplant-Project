@@ -39,7 +39,7 @@ export interface OvenStatus extends BaseStatus {
     Assignment_in_queue: boolean;
 }
 
-export interface ConveyerbeltStatus extends BaseStatus {
+export interface ConveyerStatus extends BaseStatus {
     State: ConveyerStates;
     Color: Colors;
     Queue_length: number;

@@ -13,7 +13,7 @@ class OPCUAController {
     public oven: Oven;
     public conveyerBelt: Conveyerbelt;
 
-    private ns: 1;
+    private ns = 1;
     private endpoint: string = "opc.tcp://localhost:4840/UA/TestServer/GVL/Interface";
 
     public async connect() {
@@ -23,15 +23,15 @@ class OPCUAController {
 
         this.session = await this.client.createSession();
 
-        const crane = new Crane(this.session, this.ns);
-        const conveyerBelt = new Conveyerbelt(this.session, this.ns);
-        const oven = new Oven(this.session, this.ns);
-        const warehouse = new Warehouse(this.session, this.ns);
+        this.crane = new Crane(this.session, this.ns);
+        this.conveyerBelt = new Conveyerbelt(this.session, this.ns);
+        this.oven = new Oven(this.session, this.ns);
+        this.warehouse = new Warehouse(this.session, this.ns);
 
-        await warehouse.calibrate();
-        await crane.calibrate();
-        await oven.calibrate();
-        await conveyerBelt.calibrate();
+        await this.warehouse.calibrate();
+        await this.crane.calibrate();
+        await this.oven.calibrate();
+        await this.conveyerBelt.calibrate();
 
         console.log("Ready to move");
     }
@@ -42,6 +42,5 @@ class OPCUAController {
         console.log("Session closed");
     }
 }
-
 
 export const opcuaController = new OPCUAController();

@@ -1,13 +1,25 @@
 import { DataType, ClientSession } from "node-opcua";
 import { BaseModel } from "./base";
-import { OvenStatus } from "../enums/oven";
+import { OvenStates } from "../enums/oven";
+import { OvenStatus } from "../enums/status";
 
 export class Oven extends BaseModel {
     constructor(session: ClientSession, ns: number) {
         super(session, ns, "Oven");
     }
 
-    public async readState(): Promise<OvenStatus> {
+    public async getStatus(): Promise<OvenStatus> {
+        const baseStatus = await super.getStatus();
+
+        return {
+            ...baseStatus,
+            State: await this.read("Status.State"),
+            Queue_length: await this.read("Status.Queue_length"),
+            Assignment_in_queue: await this.read("Status.Assignment_in_queue")
+        };
+    }
+
+    public async readState(): Promise<OvenStates> {
         return this.read("Status.State");
     }
 

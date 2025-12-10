@@ -1,9 +1,7 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node dist/controller.js",
-    "server": "ts-node testServer.ts",
-    "client": "ts-node controller.ts"
+    "server": "ts-node testServer.ts"
   },
   "dependencies": {
     "node-opcua": "^2.157.0"

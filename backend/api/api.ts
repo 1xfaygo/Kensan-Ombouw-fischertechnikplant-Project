@@ -2,6 +2,7 @@
 import express from "express";
 import cors from "cors";
 import { connectToOpcServer, readAllNodes, readNodeValue, writeNodeValue, nodeMap } from "./opcClient";
+import { opcuaController } from "./opcua-client/controller"
 
 const app = express();
 app.use(cors({
@@ -24,27 +25,39 @@ app.get("/api/all", async (req, res) => {
   }
 });
 
-// Endpoint: specifieke node uitlezen
-app.get("/api/read", async (req, res) => {
-  try {
-    const name = req.query.name as string;
-    if (!name || !nodeMap[name]) return res.status(400).json({ error: "Invalid node name" });
+await opcuaController.connect()
 
-    const value = await readNodeValue(nodeMap[name]);
-    res.json({ name, value });
+app.get("/api/conveyerbelt/status", async (req, res) => {
+  try {
+    const value = await opcuaController.conveyerBelt.getStatus();
+    res.json({ value });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Endpoint: waarde schrijven
-app.post("/api/write", async (req, res) => {
+app.get("/api/oven/status", async (req, res) => {
   try {
-    const { name, value } = req.body;
-    if (!name || !nodeMap[name]) return res.status(400).json({ error: "Invalid node name" });
+    const value = await opcuaController.oven.getStatus();
+    res.json({ value });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-    await writeNodeValue(nodeMap[name], value);
-    res.json({ success: true });
+app.get("/api/crane/status", async (req, res) => {
+  try {
+    const value = await opcuaController.crane.getStatus();
+    res.json({ value });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/warehouse/status", async (req, res) => {
+  try {
+    const value = await opcuaController.warehouse.getStatus();
+    res.json({ value });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

@@ -1,17 +1,30 @@
 import { DataType, ClientSession } from "node-opcua";
 import { BaseModel } from "./base";
-import { Colors, ConveyerStatus } from "../enums/conveyerbelt";
+import { Colors, ConveyerStates } from "../enums/conveyerbelt";
+import { ConveyerStatus } from "../enums/status";
 
 export class Conveyerbelt extends BaseModel {
     constructor(session: ClientSession, ns: number) {
         super(session, ns, "Conveyerbelt");
     }
 
+    public async getStatus(): Promise<ConveyerStatus> {
+        const baseStatus = await super.getStatus();
+
+        return {
+            ...baseStatus,
+            State: await this.read("Status.State"),
+            Color: await this.read("Status.Color"),
+            Queue_length: await this.read("Status.Queue_length"),
+            Assignment_in_queue: await this.read("Status.Assignment_in_queue")
+        };
+    }
+
     public async readColor(): Promise<Colors> {
         return this.read("Status.Color");
     }
 
-    public async readState(): Promise<ConveyerStatus> {
+    public async readState(): Promise<ConveyerStates> {
         return this.read("Status.State");
     }
 
