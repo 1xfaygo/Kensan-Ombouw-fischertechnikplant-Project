@@ -1,84 +1,105 @@
 import { Namespace, Variant, DataType, StatusCodes } from "node-opcua";
 
 export function createCraneObject(namespace: Namespace) {
-    let craneRunning = false;
-    let cranePos = 0;
 
     const crane = namespace.addObject({
         browseName: "Crane",
         organizedBy: namespace.addressSpace.rootFolder.objects
     });
 
+    // status variables
+
+    let ready = true;
+    let error = 0;
+    let errorStr = "No Error";
+    let craneState = 0;
+    let craneSource = 0;
+    let craneDestination = 0;
+    let assignmentSource = 0;
+    let assignmentDestination = 0;
+
+    const craneStatus = namespace.addObject({
+        browseName: "Status",
+        componentOf: crane
+    });
+
     namespace.addVariable({
-        componentOf: crane,
-        browseName: "Running",
-        nodeId: "ns=1;s=Crane.Running",
-        minimumSamplingInterval: 100,
+        componentOf: craneStatus,
+        browseName: "Ready",
+        nodeId: "ns=1;s=Crane.Status.Ready",
         dataType: "Boolean",
         value: {
-            get: () => new Variant({ dataType: DataType.Boolean, value: craneRunning }),
-            set: (variant) => {
-                craneRunning = variant.value;
-                console.log(`Crane started`);
-
-                if (craneRunning) {
-                    setTimeout(() => {
-                        craneRunning = false;
-                        console.log(`Crane finished`);
-                    }, 2000);
-                }
-                return StatusCodes.Good;
-            }
+            get: () => new Variant({ dataType: DataType.Boolean, value: ready })
         }
     });
 
     namespace.addVariable({
-        componentOf: crane,
-        browseName: "Location",
-        nodeId: "ns=1;s=Crane.Location",
-        minimumSamplingInterval: 100,
+        componentOf: craneStatus,
+        browseName: "Error",
+        nodeId: "ns=1;s=Crane.Status.Error",
         dataType: "Int16",
         value: {
-            get: () => new Variant({ dataType: DataType.Int16, value: cranePos }),
-            set: (variant) => {
-                cranePos = variant.value;
-                console.log(`Crane position set to ${variant.value}`);
-                return StatusCodes.Good;
-            }
+            get: () => new Variant({ dataType: DataType.Int16, value: error })
         }
     });
 
     namespace.addVariable({
-        componentOf: crane,
-        browseName: "PickUp",
-        nodeId: "ns=1;s=Crane.PickUp",
-        minimumSamplingInterval: 100,
-        dataType: "Boolean",
+        componentOf: craneStatus,
+        browseName: "Error_str",
+        nodeId: "ns=1;s=Crane.Status.Error_str",
+        dataType: "String",
         value: {
-            get: () => new Variant({ dataType: DataType.Boolean, value: false }),
-            set: (variant) => {
-                if (variant.value) {
-                    console.log(`Crane picking up`);
-                }
-                return StatusCodes.Good;
-            }
+            get: () => new Variant({ dataType: DataType.String, value: errorStr })
         }
     });
 
     namespace.addVariable({
-        componentOf: crane,
-        browseName: "Drop",
-        nodeId: "ns=1;s=Crane.Drop",
-        minimumSamplingInterval: 100,
-        dataType: "Boolean",
+        componentOf: craneStatus,
+        browseName: "State",
+        nodeId: "ns=1;s=Crane.Status.State",
+        dataType: "Int16",
         value: {
-            get: () => new Variant({ dataType: DataType.Boolean, value: false }),
-            set: (variant) => {
-                if (variant.value) {
-                    console.log(`Crane dropping`);
-                }
-                return StatusCodes.Good;
-            }
+            get: () => new Variant({ dataType: DataType.Int16, value: craneState })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: craneStatus,
+        browseName: "source",
+        nodeId: "ns=1;s=Crane.Status.source",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: craneSource })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: craneStatus,
+        browseName: "destination",
+        nodeId: "ns=1;s=Crane.Status.destination",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: craneDestination })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: craneStatus,
+        browseName: "Assignment_source",
+        nodeId: "ns=1;s=Crane.Status.Assignment_source",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: assignmentSource })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: craneStatus,
+        browseName: "Assignment_destination",
+        nodeId: "ns=1;s=Crane.Status.Assignment_destination",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: assignmentDestination })
         }
     });
 

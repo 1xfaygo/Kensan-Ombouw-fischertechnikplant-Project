@@ -1,33 +1,93 @@
 import { Namespace, Variant, DataType, StatusCodes } from "node-opcua";
 
 export function createConveyerbeltObject(namespace: Namespace) {
-    let conveyerRunning = false;
-
     const conveyerbelt = namespace.addObject({
         browseName: "Conveyerbelt",
         organizedBy: namespace.addressSpace.rootFolder.objects
     });
 
+    // status variables
+
+    let ready = true;
+    let error = 0;
+    let errorStr = "No Error";
+    let conveyerState = 0;
+    let color = 0;
+    let queueLength = 0;
+    let assignmentInQueue = 0;
+
+    const conveyerbeltStatus = namespace.addObject({
+        browseName: "Status",
+        componentOf: conveyerbelt
+    });
+
     namespace.addVariable({
-        componentOf: conveyerbelt,
-        browseName: "Running",
-        nodeId: "ns=1;s=Conveyerbelt.Running",
-        minimumSamplingInterval: 100,
+        componentOf: conveyerbeltStatus,
+        browseName: "Ready",
+        nodeId: "ns=1;s=Conveyerbelt.Status.Ready",
         dataType: "Boolean",
         value: {
-            get: () => new Variant({ dataType: DataType.Boolean, value: conveyerRunning }),
-            set: (variant) => {
-                conveyerRunning = variant.value;
-                console.log(`Conveyerbelt started`);
+            get: () => new Variant({ dataType: DataType.Boolean, value: ready })
+        }
+    });
 
-                if (conveyerRunning) {
-                    setTimeout(() => {
-                        conveyerRunning = false;
-                        console.log(`Conveyerbelt finished`);
-                    }, 5000);
-                }
-                return StatusCodes.Good;
-            }
+    namespace.addVariable({
+        componentOf: conveyerbeltStatus,
+        browseName: "Error",
+        nodeId: "ns=1;s=Conveyerbelt.Status.Error",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: error })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: conveyerbeltStatus,
+        browseName: "Error_str",
+        nodeId: "ns=1;s=Conveyerbelt.Status.Error_str",
+        dataType: "String",
+        value: {
+            get: () => new Variant({ dataType: DataType.String, value: errorStr })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: conveyerbeltStatus,
+        browseName: "State",
+        nodeId: "ns=1;s=Conveyerbelt.Status.State",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: conveyerState })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: conveyerbeltStatus,
+        browseName: "Color",
+        nodeId: "ns=1;s=Conveyerbelt.Status.Color",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: color })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: conveyerbeltStatus,
+        browseName: "Queue_length",
+        nodeId: "ns=1;s=Conveyerbelt.Status.Queue_length",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: queueLength })
+        }
+    });
+
+    namespace.addVariable({
+        componentOf: conveyerbeltStatus,
+        browseName: "assignment_in_queue",
+        nodeId: "ns=1;s=Conveyerbelt.Status.Assignment_in_queue",
+        dataType: "Int16",
+        value: {
+            get: () => new Variant({ dataType: DataType.Int16, value: assignmentInQueue })
         }
     });
 
