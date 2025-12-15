@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { connectToOpcServer, readAllNodes, readNodeValue, writeNodeValue, nodeMap } from "./opcClient";
 import { opcuaController } from "./opcua-client/controller"
+import 'dotenv/config';
 
 const app = express();
 app.use(cors({
@@ -63,4 +64,8 @@ app.get("/api/warehouse/status", async (req, res) => {
   }
 });
 
-app.listen(3001, () => console.log("🚀 API draait op http://localhost:3001"));
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`🚀 API draait op http://localhost:${PORT}`);
+});

@@ -1,9 +1,11 @@
 // src/backend/opcClient.ts
 import { OPCUAClient, AttributeIds, DataType, ClientSession } from "node-opcua";
 import { nodeMap } from "./nodeMap";
+import 'dotenv/config';
 export { nodeMap };
 
-const endpointUrl = "opc.tcp://localhost:4840/UA/TestServer";
+
+const endpointUrl = process.env.OPC_ENDPOINT_URL;
 let client: OPCUAClient;
 let session: ClientSession;
 

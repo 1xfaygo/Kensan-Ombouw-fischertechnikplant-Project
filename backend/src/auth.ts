@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import db from './db.js';
 import type { User, UserWithoutPassword } from './types.js';
+import 'dotenv/config'; 
 
 const SALT_ROUNDS = 10;
 
@@ -75,7 +76,14 @@ export function initDefaultUser(): void {
   
   if (result.count === 0) {
     console.log('Creating default admin user...');
-    createUser('admin@kensan.nl', 'admin123', 'Administrator', 'admin');
-    console.log('Default user created: admin@kensan.nl / admin123');
+
+    createUser(
+      process.env.DEFAULT_ADMIN_EMAIL!,
+      process.env.DEFAULT_ADMIN_PASSWORD!,
+      process.env.DEFAULT_ADMIN_NAME || 'Administrator',
+      process.env.DEFAULT_ADMIN_ROLE || 'admin'
+    );
+
+    console.log(`Default admin user created: ${process.env.DEFAULT_ADMIN_EMAIL}`);
   }
 }
