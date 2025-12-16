@@ -7,6 +7,12 @@ import fs from 'fs';
 import { initDefaultUser } from './auth.js';
 import userRoutes from './routes/userRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import { opcuaController } from "../src/opcua-client/controller"
+import warehouseRoutes from './routes/warehouseRoutes.js';
+import conveyerRoutes from './routes/conveyerRoutes.js';
+import craneRoutes from './routes/craneRoutes.js';
+import ovenRoutes from './routes/ovenRoutes.js';
+
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,9 +34,15 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+
 app.use('/profile_pictures', express.static(UPLOAD_DIR));
 app.use('/api/auth', userRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/oven', ovenRoutes)
+app.use('/api/crane', craneRoutes)
+app.use('/api/conveyer', conveyerRoutes)
+app.use('/api/warehouse', warehouseRoutes)
+
 
 app.get('/test', (req: Request, res: Response) => {
   res.json({ message: 'Server is running' });
@@ -38,6 +50,7 @@ app.get('/test', (req: Request, res: Response) => {
 
 
 initDefaultUser();
+await opcuaController.connect()
 
 
 app.listen(PORT, () => {
