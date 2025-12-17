@@ -3,28 +3,31 @@ import React, { useState, useEffect } from 'react';
 // ==============================================================================
 // 1. DATA CONTRACT (INTERFACES)
 // ==============================================================================
+type MachineStatus = "IDLE" | "BEZIG" | "FOUT" | "VERWARMEN" | "ZAGEN" | "TRANSPORTEREN" | "DRAAIT" | "SORTEREN";
+
+// Interfaces from user's input (complexere fabriek)
 interface MagazijnData {
-  status: "IDLE" | "BEZIG" | "FOUT";
+  status: MachineStatus;
   trailSensor: boolean; 
   motorConveyor: "STIL" | "VOORUIT" | "ACHTERUIT";
   motorHorizontal: "STIL" | "NAAR_STELLING" | "NAAR_BAND"; 
   motorVertical: "STIL" | "OMHOOG" | "OMLAAG";
-  motorCantilever: "STIL" | "IN" | "UIT";
+  motorCantilever: "STIL" | "IN" | "UIT"; // Cruciaal voor pickup/release logica
 }
 
 interface KraanData {
-  status: "IDLE" | "BEZIG" | "FOUT";
+  status: MachineStatus;
   posX: number;
   posY: number;
   motorVertical: "STIL" | "OMHOOG" | "OMLAAG";
   motorHorizontal: "STIL" | "VOORUIT" | "ACHTERUIT";
   motorRotate: "STIL" | "LINKS" | "RECHTS";
   compressor: boolean;
-  vacuumValve: boolean;
+  vacuumValve: boolean; // Cruciaal voor 'draagt blokje'
 }
 
 interface OvenData {
-  status: "IDLE" | "VERWARMEN" | "ZAGEN" | "TRANSPORTEREN" | "FOUT";
+  status: MachineStatus;
   temperatuur: number; 
   lichtSluis: boolean;
   motorBand: boolean;
@@ -38,7 +41,7 @@ interface OvenData {
 }
 
 interface LoopbandData {
-  status: "IDLE" | "DRAAIT" | "SORTEREN";
+  status: MachineStatus;
   kleurSensor: "GEEN" | "WIT" | "ROOD" | "BLAUW"; 
   lichtSluisInlet: boolean;
   pulseCounter: number;
@@ -56,6 +59,12 @@ interface FabriekStatus {
   loopband: LoopbandData;
 }
 
+// Kleurdefinities voor blokjes
+const KLEUREN = { WIT: '#F0F0F0', ROOD: '#FF3838', BLAUW: '#29AAE2', GEEN: '#444' };
+const KLEUR_NAMEN = ["WIT", "ROOD", "BLAUW"];
+const getRandomStartColor = () => KLEUREN[KLEUR_NAMEN[Math.floor(Math.random() * KLEUR_NAMEN.length)] as keyof typeof KLEUREN] || KLEUREN.BLAUW;
+
+
 // ==============================================================================
 // 2. CONFIGURATIE & LOCATIES
 // ==============================================================================
@@ -69,322 +78,396 @@ const nepData: FabriekStatus = {
 
 // CSS-DEFINITIES VOOR DE VASTE MACHINE-BLOKKEN
 const machineZones = {
-  magazijn: { top: '350px', left: '50px', width: '200px', height: '220px', label: "MAGAZIJN" },
-  kraan:    { top: '450px', left: '300px', width: '150px', height: '150px', label: "KRAAN" }, 
-  oven:     { top: '150px', left: '280px', width: '300px', height: '200px', label: "OVEN" },
-  loopband: { top: '100px', right: '50px', width: '140px', height: '480px', label: "LOOPBAND" } 
+  magazijn: { top: '350px', left: '50px', width: '200px', height: '220px', label: "MAGAZIJN & UITGIFT" },
+  kraan:    { top: '400px', left: '415px', width: '150px', height: '150px', label: "KRAAN ZONE" }, 
+  oven:     { top: '150px', left: '280px', width: '300px', height: '200px', label: "OVEN & ZAAG" },
+  loopband: { top: '100px', right: '50px', width: '140px', height: '480px', label: "SORTEERLIJN" } 
 };
 
-// PIJLEN
+// PIJLEN (AANGEPAST)
+const ACTIVE_COLOR = '#00FF00';
 const pijlen = [
-  <line key="p1" x1="250" y1="500" x2="300" y2="500" stroke="#666" strokeWidth="2" markerEnd="url(#arrowhead)" />,
-  <line key="p2" x1="420" y1="450" x2="420" y2="350" stroke="#666" strokeWidth="2" markerEnd="url(#arrowhead)" />,
-  <line key="p3" x1="580" y1="250" x2="650" y2="250" stroke="#666" strokeWidth="2" markerEnd="url(#arrowhead)" />,
-  <line key="p4" x1="650" y1="520" x2="450" y2="520" stroke="#666" strokeWidth="2" markerEnd="url(#arrowhead)" />
+  <line key="p1" x1="250" y1="500" x2="380" y2="500" stroke={ACTIVE_COLOR} strokeWidth="3" markerEnd="url(#arrowhead)" opacity="0.6" />, 
+  <line key="p2" x1="450" y1="400" x2="450" y2="350" stroke={ACTIVE_COLOR} strokeWidth="3" markerEnd="url(#arrowhead)" opacity="0.6" />, 
+  <line key="p3" x1="580" y1="250" x2="700" y2="250" stroke={ACTIVE_COLOR} strokeWidth="3" markerEnd="url(#arrowhead)" opacity="0.6" />, 
+  <line key="p4" x1="720" y1="250" x2="720" y2="500" stroke={ACTIVE_COLOR} strokeWidth="3" markerEnd="url(#arrowhead)" opacity="0.6" />, 
+  <line key="p5" x1="720" y1="500" x2="530" y2="500" stroke={ACTIVE_COLOR} strokeWidth="3" markerEnd="url(#arrowhead)" opacity="0.6" /> 
 ];
 
 // POSITIES VOOR HET BLOKJE
 const blokjePosities: { [key: string]: React.CSSProperties } = {
-  magazijn_stelling: { top: '370px', left: '175px' },   
-  magazijn_gepakt:   { top: '370px', left: '130px' },  
-  magazijn_op_band:  { top: '480px', left: '130px' },  
-  magazijn_uitgifte: { top: '480px', left: '200px' },  
+  // Magazijn (vaste locaties - gebruikt wanneer de kraan het niet vasthoudt)
+  magazijn_stelling: { top: '390px', left: '170px' },   
+  magazijn_gepakt:   { top: '390px', left: '110px' },  
+  magazijn_op_band:  { top: '500px', left: '110px' },  
+  magazijn_uitgifte: { top: '500px', left: '220px' },  
   
-  kraan_haalt_op: { top: '480px', left: '350px' }, 
-  kraan_pakt: { top: '480px', left: '350px' },
-  kraan_draait_met_blokje: { top: '350px', left: '350px' }, 
-  kraan_zet_het_blokeje: {top: '250px', left: '325px'},
+  // Kraan Pick-up & Draai
+  kraan_haalt_op: 	  { top: '475px', left: '410px' }, 
+  kraan_draait_met_blokje: { top: '450px', left: '450px' }, 
   
-  bij_oven:   { top: '250px', left: '350px' },
-  in_oven:    { top: '250px', left: '400px' },
-  einde_oven: { top: '250px', left: '450px' },
-  begin_zaag: { top: '250px', left: '500px' },
-  einde_zaag: { top: '250px', left: '550px' },
-  schuift_naar_band: {top: '250px', left: '600px'},
+  // Oven Invoer & Proces
+  bij_oven_invoer: 	  { top: '220px', left: '330px' },
+  in_oven: 	          { top: '220px', left: '400px' },
+  na_oven_zaag: 	  { top: '220px', left: '520px' },
+  
+  // Naar Loopband
+  schuift_naar_band: { top: '240px', left: '600px'}, 
 
-  op_band:    { top: '250px', left: '700px' },
-  lopend_band: { top: '300px', left: '700px'},
-  check_band: { top: '400px', left: '700px'},
-  eind_band:  { top: '500px', left: '700px' }
+  // Loopband
+  op_band: 	  { top: '240px', left: '720px' }, 
+  loop_band: 	  { top: '350px', left: '720px' }, 
+  check_band: 	  { top: '450px', left: '720px' }, 
+  eind_band_sorteer: { top: '520px', left: '720px' },
+  
+  // Sorteer Uitvoer & Retour
+  retour_kraan:     { top: '520px', left: '530px' },
 };
 
 // POSITIES VOOR DE MAGAZIJN KRAAN
 const magazijnKraanPosities: { [key: string]: React.CSSProperties } = {
   thuis:        { top: '500px', left: '120px' },  
-  bij_stelling: { top: '365px', left: '120px' },  
-  uitgeschoven: { top: '365px', left: '125px' }, 
-  bij_band:     { top: '475px', left: '125px' }, 
+  bij_stelling: { top: '375px', left: '120px' },  
+  uitgeschoven: { top: '375px', left: '170px' }, 
+  bij_band:     { top: '490px', left: '170px' }, 
 };
 
 // ==============================================================================
-// 3. SIMULATIE SCRIPT
+// 3. SIMULATIE SCRIPT (CRUCIALE WIJZIGINGEN VOOR MAGAZIJNKRAAN PICKUP)
 // ==============================================================================
 interface SimulatieStap {
   blokjeLocatie: string;
   magazijnKraanLocatie: string;
-  groteKraanRotatie: "LINKS" | "RECHTS" | "STIL"; 
+  groteKraanRotatie: KraanData['motorRotate']; 
   blokjeKleur?: string; 
   log: string;
   data: FabriekStatus;
   duur?: number; 
 }
 
+const startKleur = getRandomStartColor();
+const finalKleur = KLEUREN.ROOD; 
+
 const simulatieStappen: SimulatieStap[] = [
-  { 
-    blokjeLocatie: "magazijn_stelling",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log: "Magazijn: Start. Wachten op order.", 
-    data: nepData,
-    duur: 2000
-  },
-  { 
-    blokjeLocatie: "magazijn_stelling",
-    magazijnKraanLocatie: "bij_stelling",
-    groteKraanRotatie: "STIL",
-    log: "Magazijn: Lift beweegt naar stelling...", 
-    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorVertical: "OMHOOG" } } 
-  },
-  { 
-    blokjeLocatie: "magazijn_gepakt", 
-    magazijnKraanLocatie: "uitgeschoven",
-    groteKraanRotatie: "STIL",
-    log: "Magazijn: Arm haalt blokje op.", 
-    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorHorizontal: "NAAR_STELLING", motorCantilever: "UIT" } } ,
-    duur: 2000
-  },
-  { 
-    blokjeLocatie: "magazijn_op_band", 
-    magazijnKraanLocatie: "bij_band",
-    groteKraanRotatie: "STIL",
-    log: "Magazijn: Brengt blokje naar uitvoerband.", 
-    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorVertical: "OMLAAG" } } 
-  },
-  { 
-    blokjeLocatie: "magazijn_uitgifte", 
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "LINKS", 
-    log: "Magazijn: Band voert blokje uit. Kraan draait...", 
-    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorConveyor: "VOORUIT", trailSensor: true }, kraan: { ...nepData.kraan, status: "BEZIG", motorRotate: "LINKS" } } 
-  },
+  // 0. START
+  { blokjeLocatie: "magazijn_stelling", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: `Cyclus gestart. Startkleur: ${Object.keys(KLEUREN).find(k => KLEUREN[k as keyof typeof KLEUREN] === startKleur)}`, data: nepData, duur: 2000 },
+  
+  // --- FASE 1: MAGAZIJN OPHALEN ---
+  { blokjeLocatie: "magazijn_stelling", magazijnKraanLocatie: "bij_stelling", groteKraanRotatie: "STIL", log: "Magazijn: Lift beweegt naar stelling...", 
+    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorVertical: "OMHOOG" } } },
+  
+  // Arm haalt op (Cantilever UIT, holding block)
+  { blokjeLocatie: "magazijn_gepakt", magazijnKraanLocatie: "uitgeschoven", groteKraanRotatie: "STIL", log: "Magazijn: Arm haalt blokje op. (Cantilever UIT)", 
+    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorHorizontal: "NAAR_STELLING", motorCantilever: "UIT", motorVertical: "OMHOOG" } }, duur: 1000 },
+  
+  // Brengt blokje naar uitvoerband (Cantilever IN, holding block, moving down)
+  { blokjeLocatie: "magazijn_op_band", magazijnKraanLocatie: "bij_band", groteKraanRotatie: "STIL", log: "Magazijn: Brengt blokje naar uitvoerband. (Lift OMLAAG, Cantilever IN)", 
+    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorVertical: "OMLAAG", motorCantilever: "IN" } } },
+  
+  // VRIJGEVEN BLOKJE & Terug naar thuispositie (Cantilever STIL)
+  { blokjeLocatie: "magazijn_uitgifte", magazijnKraanLocatie: "thuis", groteKraanRotatie: "LINKS", log: "Magazijn: Band voert blokje uit. Kraan draait.", 
+    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "IDLE", motorConveyor: "VOORUIT", trailSensor: true, motorCantilever: "STIL" }, kraan: { ...nepData.kraan, status: "BEZIG", motorRotate: "LINKS" } }, duur: 2000 },
 
-  { 
-    blokjeLocatie: "kraan_haalt_op", 
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "LINKS", 
-    log: "Kraan: Vacuüm aan, pakt product.", 
-    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "IDLE" }, kraan: { ...nepData.kraan, status: "BEZIG", vacuumValve: true, compressor: true } },
-    duur: 3000
-  },
-  { 
-    blokjeLocatie: "kraan_draait_met_blokje",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log: "Kraan: Draait met blokje...", 
-    data: { ...nepData, kraan: { ...nepData.kraan, status: "BEZIG", vacuumValve: true, motorRotate: "RECHTS" } } 
-  },
-  { 
-    blokjeLocatie: "bij_oven", 
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL", 
-    log: "Kraan: Legt blokje bij oven neer.", 
-    data: { ...nepData, kraan: { ...nepData.kraan, status: "BEZIG", vacuumValve: true, motorRotate: "RECHTS" } } 
-  },
-  { 
-    blokjeLocatie: "bij_oven", 
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL", 
-    log: "OVEN: blokje is nu bij de oven staat klaar om in de oven te gaan ", 
-    data: { ...nepData, kraan: { ...nepData.kraan, status: "BEZIG", vacuumValve: true, motorRotate: "RECHTS" } }  
-  },
-  {
-    blokjeLocatie: "in_oven",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log: "OVEN: blokje gaat nu de oven in",
-    data: { ...nepData, kraan: { ...nepData.kraan, status: "IDLE", vacuumValve: false }, oven: { ...nepData.oven, status: "VERWARMEN", motorFeeder: "IN", temperatuur: 50, lichtOven: true } } 
-  },
-  {
-    blokjeLocatie: "in_oven",
-    blokjeKleur: "#red",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log: "OVEN: blokje is nu aan het verwarmen",
-    data: {...nepData,oven: {...nepData.oven, status: "VERWARMEN", motorFeeder: "IN", temperatuur: 300, lichtOven: true}},
-    duur: 5000
-  },
-  {
-    blokjeLocatie: "einde_oven",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log: "OVEN: blokje is klaar met verwarmen",
-    data: {...nepData,oven: {...nepData.oven, status: "VERWARMEN", motorFeeder: "IN", temperatuur: 50, lichtOven: true}},
-  },
-  {
-    blokjeLocatie: "begin_zaag",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log:"OVEN: blokje wordt nu gezaagd en wordt afgekoeld",
-    data: { ...nepData, oven: { ...nepData.oven, status: "TRANSPORTEREN", temperatuur: 150, motorDraaitafel: "DRAAIT" } },
-    duur: 5000
-  },
-  {
-    blokjeLocatie: "einde_zaag",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log:"OVEN: blokje is gezaagd",
-    data: { ...nepData, oven: { ...nepData.oven, status: "ZAGEN", temperatuur: 0, motorDraaitafel: "DRAAIT" } }
-  },
-  {
-    blokjeLocatie: "schuift_naar_band",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log:"LOOPBAND: blokje is op de loopband gezet",
-    data: { ...nepData, oven: { ...nepData.oven, status: "TRANSPORTEREN", temperatuur: 0, motorDraaitafel: "DRAAIT" } }
-  },
-  {
-    blokjeLocatie: "op_band",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log:"LOOPBAND: blokje is op de loopband gezet",
-    data: { ...nepData, loopband: { ...nepData.loopband, status: "DRAAIT", motorBand: true, pulseCounter: 50 } } 
-  },
-  {
-    blokjeLocatie: "loop_band",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log:"LOOPBAND: blokje gaat rolt voor de scanner",
-    data: { ...nepData, loopband: { ...nepData.loopband, status: "DRAAIT", motorBand: true, pulseCounter: 50 } } 
-  },
-  {
-    blokjeLocatie: "check_band",
-    magazijnKraanLocatie: "thuis",
-    groteKraanRotatie: "STIL",
-    log:"LOOPBAND: blokje is langs de scanner en gaat door naar de soorteerplek",
-    data: { ...nepData, loopband: { ...nepData.loopband, status: "DRAAIT", motorBand: true, pulseCounter: 50 } } 
-  },
+  // --- FASE 2: KRAAN CYCLUS 1 (Magazijn -> Oven) ---
+  { blokjeLocatie: "kraan_haalt_op", magazijnKraanLocatie: "thuis", groteKraanRotatie: "LINKS", log: "Kraan: Vacuüm AAN, pakt product.", data: { ...nepData, kraan: { ...nepData.kraan, status: "BEZIG", vacuumValve: true, compressor: true, motorRotate: "LINKS" }, magazijn: { ...nepData.magazijn, motorConveyor: "STIL" } }, duur: 1000 },
+  { blokjeLocatie: "kraan_draait_met_blokje", magazijnKraanLocatie: "thuis", groteKraanRotatie: "RECHTS", log: "Kraan: Draait met blokje naar oven.", data: { ...nepData, kraan: { ...nepData.kraan, status: "BEZIG", vacuumValve: true, motorRotate: "RECHTS" } }, duur: 2000 },
+  { blokjeLocatie: "bij_oven_invoer", magazijnKraanLocatie: "thuis", groteKraanRotatie: "RECHTS", log: "Kraan: Laat blokje los bij oven-invoer.", data: { ...nepData, kraan: { ...nepData.kraan, status: "IDLE", vacuumValve: false, compressor: false, motorRotate: "RECHTS" } }, duur: 1000 },
 
+  // --- FASE 3: OVEN PROCES (Verwarmen & Zagen) ---
+  { blokjeLocatie: "in_oven", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Oven: Blokje gaat oven in. Verwarmen start.", data: { ...nepData, oven: { ...nepData.oven, status: "VERWARMEN", temperatuur: 50, motorFeeder: "IN", ovenDeur: "DICHT", lichtOven: true } } },
+  { blokjeLocatie: "in_oven", blokjeKleur: finalKleur, magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Oven: TEMPERATUUR HOOG. Kleur verandert.", data: { ...nepData, oven: { ...nepData.oven, status: "VERWARMEN", temperatuur: 300, ovenDeur: "DICHT", lichtOven: true } }, duur: 4000 },
+  { blokjeLocatie: "na_oven_zaag", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Oven: Product verplaatst naar zaag/afkoelen.", data: { ...nepData, oven: { ...nepData.oven, status: "ZAGEN", temperatuur: 100, motorFeeder: "UIT", motorZaag: true } }, duur: 3000 },
+  
+  // --- FASE 4: NAAR LOOPBAND ---
+  { blokjeLocatie: "schuift_naar_band", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Oven: Klaar. Schuift naar band.", data: { ...nepData, oven: { ...nepData.oven, status: "TRANSPORTEREN", temperatuur: 40, motorZaag: false } } },
+  { blokjeLocatie: "op_band", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Loopband: Transport start. Band AAN.", data: { ...nepData, loopband: { ...nepData.loopband, status: "DRAAIT", motorBand: true } }, duur: 1000 },
+  { blokjeLocatie: "loop_band", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Loopband: Blokje passeert de lichtsluis.", data: { ...nepData, loopband: { ...nepData.loopband, status: "DRAAIT", motorBand: true, lichtSluisInlet: true, pulseCounter: 1 } }, duur: 1500 },
+  { blokjeLocatie: "check_band", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Loopband: Kleur gescand (ROOD).", data: { ...nepData, loopband: { ...nepData.loopband, status: "SORTEREN", motorBand: true, kleurSensor: "ROOD" } }, duur: 1500 },
+  
+  // --- FASE 5: SORTEREN & KRAAN CYCLUS 2 (TERUGBRENGEN) ---
+  { blokjeLocatie: "eind_band_sorteer", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Loopband: Sorteren. Ejector Rood AAN (simulatie).", data: { ...nepData, loopband: { ...nepData.loopband, status: "SORTEREN", motorBand: false, ejectorRood: true } }, duur: 1000 },
+  { blokjeLocatie: "retour_kraan", magazijnKraanLocatie: "thuis", groteKraanRotatie: "LINKS", log: "Kraan: Draait en pakt gesorteerd product.", data: { ...nepData, kraan: { ...nepData.kraan, status: "BEZIG", motorRotate: "LINKS", vacuumValve: true, compressor: true } }, duur: 1000 },
+  { blokjeLocatie: "kraan_draait_met_blokje", magazijnKraanLocatie: "thuis", groteKraanRotatie: "RECHTS", log: "Kraan: Draait terug naar magazijn.", data: { ...nepData, kraan: { ...nepData.kraan, status: "BEZIG", vacuumValve: true, motorRotate: "RECHTS" } }, duur: 2000 },
+  { blokjeLocatie: "magazijn_uitgifte", magazijnKraanLocatie: "thuis", groteKraanRotatie: "RECHTS", log: "Kraan: Laat los op magazijn band.", data: { ...nepData, kraan: { ...nepData.kraan, status: "IDLE", motorRotate: "RECHTS", vacuumValve: false, compressor: false } }, duur: 1000 },
 
-
+  // --- FASE 6: MAGAZIJN TERUGPLAATSEN (Smooth Return) ---
+  // Kraan gaat naar bij_band positie, pakt het blokje (Cantilever IN)
+  { blokjeLocatie: "magazijn_op_band", magazijnKraanLocatie: "bij_band", groteKraanRotatie: "STIL", log: "Magazijn: Neemt blokje aan. (Cantilever IN)", 
+    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorConveyor: "ACHTERUIT", motorCantilever: "IN" } } },
+  // Kraan gaat naar bij_stelling positie (Cantilever IN, holding block)
+  { blokjeLocatie: "magazijn_stelling", magazijnKraanLocatie: "bij_stelling", groteKraanRotatie: "STIL", log: "Magazijn: Brengt terug naar stelling.", 
+    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "BEZIG", motorVertical: "OMHOOG", motorCantilever: "IN" } }, duur: 1000 },
+  // Magazijn Teruggeplaatst (Cantilever STIL om los te laten)
+  { blokjeLocatie: "magazijn_stelling", magazijnKraanLocatie: "thuis", groteKraanRotatie: "STIL", log: "Magazijn: Teruggeplaatst. Cyclus voltooid.", 
+    data: { ...nepData, magazijn: { ...nepData.magazijn, status: "IDLE", motorConveyor: "STIL", motorCantilever: "STIL" } }, duur: 3000 },
 ];
 
+
 // ==============================================================================
-// 4. COMPONENTEN (PUUR CSS, GEEN AFBEELDINGEN)
+// 4. COMPONENTEN (STIJL EN SYNCHRONISATIE)
 // ==============================================================================
 
-const isMachineActief = (status: string) => {
-  const actieveStatussen = ["BEZIG", "VERWARMEN", "ZAGEN", "TRANSPORTEREN", "DRAAIT", "SORTEREN"];
-  return actieveStatussen.includes(status);
-};
+const isMachineActief = (status: MachineStatus) => ["BEZIG", "VERWARMEN", "ZAGEN", "TRANSPORTEREN", "DRAAIT", "SORTEREN"].includes(status);
 
-const MachineBlock = ({ zone, status }: { zone: any, status: string }) => {
+const MachineBlock = ({ zone, status }: { zone: any, status: MachineStatus }) => {
   const actief = isMachineActief(status);
-  const bgKleur = actief ? 'rgba(86, 240, 0, 0.2)' : 'rgba(255, 255, 255, 0.05)'; 
   const randKleur = actief ? '#56F000' : '#666'; 
   const tekstKleur = actief ? '#56F000' : '#aaa';
 
   return (
-    <div className="absolute flex items-center justify-center font-bold text-xl transition-colors duration-500"
-      style={{ top: zone.top, left: zone.left, right: zone.right, width: zone.width, height: zone.height, border: `2px dashed ${randKleur}`, backgroundColor: bgKleur, color: tekstKleur, borderRadius: '8px', zIndex: 2 }}>
+    <div className="absolute flex flex-col items-center justify-center font-bold text-xl transition-colors duration-500 rounded-xl shadow-2xl"
+      style={{ 
+        top: zone.top, 
+        left: zone.left, 
+        right: zone.right, 
+        width: zone.width, 
+        height: zone.height, 
+        border: `3px solid ${randKleur}`, 
+        backgroundColor: 'rgba(25, 25, 35, 0.9)', 
+        color: tekstKleur, 
+        zIndex: 2, 
+        boxShadow: `0 0 15px ${actief ? 'rgba(86, 240, 0, 0.5)' : 'rgba(0, 0, 0, 0.5)'}` 
+      }}>
       {zone.label}
+      <div className="text-sm font-light mt-1 text-gray-400">{status}</div>
     </div>
   );
 };
 
-const Blokje = ({ style, kleur = "#29AAE2" }: { style: React.CSSProperties, kleur?: string }) => (
-  <div className="absolute shadow-lg flex items-center justify-center"
-    style={{ width: '40px', height: '40px', transition: 'all 1s ease-in-out, background-color 0.5s', zIndex: 20, backgroundColor: kleur, border: '2px solid #fff', borderRadius: '4px', ...style }}>
-    <div style={{ width: '20px', height: '20px', border: '1px solid rgba(255,255,255,0.5)', borderRadius: '2px' }}></div>
+const Blokje = ({ style, kleur = KLEUREN.BLAUW }: { style: React.CSSProperties, kleur?: string }) => (
+  <div className="absolute shadow-xl flex items-center justify-center"
+    style={{ 
+      width: '40px', 
+      height: '40px', 
+      transition: 'all 1s ease-in-out, background-color 0.5s', 
+      zIndex: 20, 
+      backgroundColor: kleur, 
+      borderRadius: '6px', 
+      border: '3px solid #fff', 
+      boxShadow: `0 0 12px ${kleur}` , 
+      transform: 'translate(-50%, -50%)',
+      ...style 
+    }}>
+      <div className="text-xs font-semibold text-gray-900 leading-none">P</div>
   </div>
 );
 
-const MagazijnKraan = ({ style }: { style: React.CSSProperties }) => (
-  <div className="absolute flex items-center justify-center transition-all duration-1000 ease-in-out"
-    style={{ ...style, width: '50px', height: '50px', zIndex: 15 }}>
-    <svg viewBox="0 0 100 100" width="100%" height="100%" fill="none" stroke="#FFD325" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="20" y="10" width="60" height="80" rx="5" />
-      <line x1="20" y1="10" x2="80" y2="90" opacity="0.5" strokeWidth="2" />
-      <line x1="80" y1="10" x2="20" y2="90" opacity="0.5" strokeWidth="2" />
-      <path d="M 10 30 H 20" /> <path d="M 80 30 H 90" />
-      <path d="M 10 70 H 20" /> <path d="M 80 70 H 90" />
-      <path d="M 35 90 V 95 H 65 V 90" fill="none" />
-    </svg>
-  </div>
-);
+const MagazijnKraan = ({ style, cantileverStatus }: { style: React.CSSProperties, cantileverStatus: MagazijnData['motorCantilever'] }) => {
+    // Offset om de arm te simuleren
+    // We gebruiken 'IN' als de grijpstand (ingetrokken met blokje) en 'UIT' als de arm is uitgeschoven
+    const armOffset = cantileverStatus === 'UIT' ? '40px' : '0px'; 
+    const isCarrying = cantileverStatus !== 'STIL';
 
-// [AANGEPAST] DE GROTE DRAAIENDE TORENKRAAN
-const GroteKraan = ({ style, rotatie }: { style: React.CSSProperties, rotatie: "LINKS" | "RECHTS" | "STIL" }) => {
+    return (
+        <div className="absolute flex items-center justify-center transition-all duration-1000 ease-in-out"
+            style={{ ...style, width: '60px', height: '60px', zIndex: 15, transform: 'translate(-50%, -50%)' }}>
+            <svg viewBox="0 0 100 100" width="100%" height="100%" fill="none" stroke="#FFD325" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+              {/* Kraan Behuizing */}
+              <rect x="20" y="10" width="60" height="80" rx="8" fill="rgba(50, 50, 50, 0.9)" strokeWidth="3" />
+              {/* Lift rails */}
+              <line x1="25" y1="15" x2="25" y2="85" stroke="#aaa" strokeWidth="1" />
+              <line x1="75" y1="15" x2="75" y2="85" stroke="#aaa" strokeWidth="1" />
+              
+              {/* Cantilever Arm met animatie */}
+              <g style={{ transform: `translateX(${armOffset})`, transition: 'transform 1s ease-in-out' }}>
+                  <rect x="35" y="70" width="30" height="10" fill={isCarrying ? '#56F000' : '#444'} stroke="#FFD325" strokeWidth="2" />
+                  {/* Visuele Grijppunt indicator */}
+                  {isCarrying && <circle cx="50" cy="75" r="3" fill="#FFF" />} 
+              </g>
+              
+            </svg>
+        </div>
+    );
+};
+
+// --- GROTE KRAAN MET INGEBOUWDE BLOKJE-LOGICA ---
+const GroteKraan = ({ style, rotatie, isCarrying, blokjeKleur }: { style: React.CSSProperties, rotatie: KraanData['motorRotate'], isCarrying: boolean, blokjeKleur: string }) => {
   let draaiHoek = 0;
-  if (rotatie === "LINKS") draaiHoek = -45;
-  if (rotatie === "RECHTS") draaiHoek = 45;
+  if (rotatie === "LINKS") draaiHoek = -60;
+  if (rotatie === "RECHTS") draaiHoek = 60;
 
   return (
     <div className="absolute flex items-center justify-center transition-transform duration-1000 ease-in-out"
-      style={{ ...style, width: '250px', height: '250px', zIndex: 10, transform: `rotate(${draaiHoek}deg)`, transformOrigin: 'bottom center' }}>
-      <svg viewBox="0 0 300 300" width="100%" height="100%" fill="none">
-        <rect x="130" y="130" width="40" height="40" fill="#555" stroke="#333" strokeWidth="2" />
-        <circle cx="150" cy="150" r="12" fill="#333" />
-        <rect x="140" y="10" width="20" height="260" fill="#FFD325" stroke="#333" strokeWidth="2" rx="2" />
-        <line x1="140" y1="50" x2="160" y2="50" stroke="#333" strokeWidth="1" opacity="0.5" />
-        <line x1="140" y1="100" x2="160" y2="100" stroke="#333" strokeWidth="1" opacity="0.5" />
-        <line x1="140" y1="150" x2="160" y2="150" stroke="#333" strokeWidth="1" opacity="0.5" />
-        <line x1="140" y1="200" x2="160" y2="200" stroke="#333" strokeWidth="1" opacity="0.5" />
-        <rect x="140" y="270" width="20" height="20" fill="#888" stroke="#333" strokeWidth="2" />
+      style={{ 
+        ...style, 
+        width: '300px', 
+        height: '300px', 
+        zIndex: 10, 
+        transform: `translate(-50%, 0%) rotate(${draaiHoek}deg)`, 
+        transformOrigin: '50% 100%' 
+      }}>
+      <svg viewBox="0 0 400 400" width="100%" height="100%" fill="none">
+        
+        {/* Voet en Mast */}
+        <rect x="180" y="320" width="40" height="40" fill="#444" stroke="#666" strokeWidth="3" />
+        <circle cx="200" cy="340" r="15" fill="#333" />
+        
+        {/* De Arm (Giek) - Geel */}
+        <rect x="190" y="0" width="20" height="340" fill="#FFD325" stroke="#333" strokeWidth="2" rx="5" />
+        
+        {/* Loopkat / Grijper (Vaste positie op de arm) */}
         <g style={{ transform: 'translateY(40px)' }}> 
-            <rect x="125" y="30" width="50" height="30" fill="#29AAE2" stroke="#fff" strokeWidth="2" rx="4" />
-            <circle cx="150" cy="45" r="6" fill="#fff" />
-            <line x1="150" y1="45" x2="150" y2="45" stroke="#fff" strokeWidth="2" strokeDasharray="2 2" />
+            {/* Loopkat zelf (Blauw blok) */}
+            <rect x="165" y="50" width="70" height="30" fill="#29AAE2" stroke="#fff" strokeWidth="3" rx="4" />
+            
+            {/* HET BLOKJE DAT MEEGAAT MET DE KRAAN (CRUCIAAL) */}
+            {isCarrying && (
+                <Blokje 
+                    style={{ 
+                      top: '110px', 
+                      left: '200px',
+                      // Reset vertaling die Blokje al heeft en positioneer op de arm
+                      transform: 'translate(-50%, -50%)', 
+                      position: 'absolute' 
+                    }} 
+                    kleur={blokjeKleur} 
+                />
+            )}
         </g>
       </svg>
     </div>
   );
 };
 
-const FactoryView = ({ blokjePositionStyle, blokjeKleur, magazijnKraanStyle, groteKraanRotatie, data }: { blokjePositionStyle: React.CSSProperties, blokjeKleur: string, magazijnKraanStyle: React.CSSProperties, groteKraanRotatie: "LINKS"|"RECHTS"|"STIL", data: FabriekStatus }) => (
-  <div className="card h-[600px] relative p-5 bg-neutral-900 overflow-hidden border border-gray-700"> 
-    <h2 className="text-xl font-bold mb-4 text-kensan-white z-20 relative">Top View</h2>
-    
-    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
-        <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
-            </marker>
-        </defs>
-        {pijlen.map((pijl, i) => <g key={i}>{pijl}</g>)}
-    </svg>
+const FactoryView = ({ blokjePositionStyle, blokjeKleur, magazijnKraanStyle, groteKraanRotatie, data }: { blokjePositionStyle: React.CSSProperties, blokjeKleur: string, magazijnKraanStyle: React.CSSProperties, groteKraanRotatie: KraanData['motorRotate'], data: FabriekStatus }) => {
+  
+  const isGroteKraanCarrying = data.kraan.vacuumValve;
+  // Bepaal of de MagazijnKraan het blokje vasthoudt (Cantilever niet STIL)
+  const isMagazijnCarrying = data.magazijn.motorCantilever !== 'STIL';
 
-    <MachineBlock zone={machineZones.magazijn} status={data.magazijn.status} />
-    <GroteKraan style={machineZones.kraan} rotatie={groteKraanRotatie} />
-    <MachineBlock zone={machineZones.oven} status={data.oven.status} />
-    <MachineBlock zone={machineZones.loopband} status={data.loopband.status} />
+  let blockToRender = null;
 
-    <MagazijnKraan style={magazijnKraanStyle} />
-    <Blokje style={blokjePositionStyle} kleur={blokjeKleur} />
-  </div>
-);
+  if (isGroteKraanCarrying) {
+      // Blokje zit in de Grote Kraan (reeds geïmplementeerd)
+      blockToRender = null; 
+  } else if (isMagazijnCarrying) {
+      // Blokje volgt de MagazijnKraan (nieuwe logica)
+      // We gebruiken de MagazijnKraan's positie als basis en voegen een kleine visuele offset toe
+      const blockFollowsMagazijnKraanStyle: React.CSSProperties = {
+          // De positie van de kraan + offset
+          top: `calc(${magazijnKraanStyle.top} - 10px)`, 
+          left: `calc(${magazijnKraanStyle.left} + 15px)`, 
+          zIndex: 25 
+      };
+      blockToRender = <Blokje style={blockFollowsMagazijnKraanStyle} kleur={blokjeKleur} />;
+  } else {
+      // Standaard weergave op de band, stelling, oven, etc.
+      blockToRender = <Blokje style={blokjePositionStyle} kleur={blokjeKleur} />;
+  }
+
+
+  return (
+    <div className="card h-[600px] relative p-5 bg-gray-800 overflow-hidden border border-gray-700 shadow-2xl"> 
+      <h2 className="text-2xl font-extrabold mb-4 text-white z-20 relative">Fabriek Overzicht (Top View)</h2>
+      
+      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+          <defs>
+              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill={ACTIVE_COLOR} />
+              </marker>
+          </defs>
+          {pijlen.map((pijl, i) => <g key={i}>{pijl}</g>)}
+      </svg>
+
+      <MachineBlock zone={machineZones.magazijn} status={data.magazijn.status} />
+      <GroteKraan 
+          style={{ top: machineZones.kraan.top, left: machineZones.kraan.left, width: '250px', height: '250px' }} 
+          rotatie={groteKraanRotatie} 
+          isCarrying={isGroteKraanCarrying} 
+          blokjeKleur={blokjeKleur} 
+      />
+      <MachineBlock zone={machineZones.oven} status={data.oven.status} />
+      <MachineBlock zone={machineZones.loopband} status={data.loopband.status} />
+
+      <MagazijnKraan style={magazijnKraanStyle} cantileverStatus={data.magazijn.motorCantilever} />
+      
+      {/* Conditonele weergave van het blokje */}
+      {blockToRender}
+
+    </div>
+  );
+};
 
 const StatusPanel = ({ data, logs }: { data: FabriekStatus, logs: string[] }) => (
-  <div className="flex flex-col gap-5">
-    <div className="card p-5 border border-gray-700"><h2 className="text-lg font-bold text-kensan-white mb-2">Oven</h2><div className="text-gray-300">Temp: <span className={data.oven.temperatuur > 100 ? "text-red-500 font-bold" : "text-kensan-light_orange"}>{data.oven.temperatuur}°C</span> | Status: {data.oven.status}</div></div>
-    <div className="card p-5 border border-gray-700"><h2 className="text-lg font-bold text-kensan-white mb-2">Kraan</h2><div className="text-gray-300">Rotatie: {data.kraan.motorRotate} | Vacuüm: {data.kraan.vacuumValve ? "AAN" : "UIT"}</div></div>
-    <div className="card p-5 border border-gray-700"><h2 className="text-lg font-bold text-kensan-white mb-2">Magazijn</h2><div className="text-gray-300">Status: {data.magazijn.status}</div></div>
-    <div className="card p-5 border border-gray-700"><h2 className="text-lg font-bold text-kensan-white mb-2">Sorteerlijn</h2><div className="text-gray-300">Status: {data.loopband.status}</div></div>
-    <div className="card p-5 border border-gray-700">
-      <h2 className="text-lg font-bold text-kensan-white mb-2">Systeem Log</h2>
-      <pre className="h-32 overflow-y-scroll p-2 rounded font-mono text-sm" style={{ backgroundColor: 'var(--divider-color)', color: 'var(--text-secondary)'}}>{logs.join('\n')}</pre>
+  <div className="flex flex-col gap-3">
+    <h2 className="text-xl font-bold text-white mb-2">Status Paneel</h2>
+    
+    {/* Dynamisch status kaartje component */}
+    {Object.entries({
+      Oven: data.oven, 
+      Kraan: data.kraan, 
+      Magazijn: data.magazijn, 
+      Sorteerlijn: data.loopband 
+    }).map(([title, item]) => {
+      let details;
+      let statusColor = isMachineActief(item.status as MachineStatus) ? "text-yellow-400" : "text-green-400";
+      
+      switch(title) {
+        case 'Oven':
+          details = (
+            <div className="text-sm">
+              Temp: <span className={item.temperatuur > 200 ? "text-red-400 font-bold" : "text-green-400"}>{item.temperatuur}°C</span> | 
+              Zaag: {item.motorZaag ? 'AAN' : 'UIT'} | 
+              Deur: {item.ovenDeur}
+            </div>
+          );
+          if (item.status === 'FOUT') statusColor = 'text-red-500';
+          break;
+        case 'Kraan':
+          details = (
+            <div className="text-sm">
+              Rotatie: {item.motorRotate} | 
+              Vacuüm: {item.vacuumValve ? "AAN" : "UIT"}
+            </div>
+          );
+          break;
+        case 'Magazijn':
+          details = (
+            <div className="text-sm">
+              Lift: {item.motorVertical} | 
+              Arm: {item.motorCantilever}
+            </div>
+          );
+          break;
+        case 'Sorteerlijn':
+          details = (
+            <div className="text-sm">
+              Kleur: <span style={{ color: KLEUREN[item.kleurSensor as keyof typeof KLEUREN] }}>{item.kleurSensor}</span> | 
+              Band: {item.motorBand ? 'AAN' : 'UIT'}
+            </div>
+          );
+          break;
+        default:
+          details = <div className="text-sm">Status: {item.status}</div>;
+      }
+
+      return (
+        <div key={title} className="p-4 rounded-lg bg-gray-900 border border-gray-700 shadow-md">
+          <h3 className="font-semibold text-white mb-1">{title}</h3>
+          <div className={`text-xs font-mono mb-1 ${statusColor}`}>{item.status}</div>
+          {details}
+        </div>
+      );
+    })}
+
+    <div className="p-4 rounded-lg bg-gray-900 border border-gray-700 mt-2 shadow-md">
+      <h3 className="font-semibold text-white mb-2">Systeem Log</h3>
+      <pre className="h-36 overflow-y-scroll p-2 rounded font-mono text-xs bg-gray-700 text-green-300 border border-gray-600">
+        {logs.join('\n')}
+      </pre>
     </div>
   </div>
 );
 
 // ==============================================================================
-// 4. HOOFD COMPONENT
+// 5. HOOFD COMPONENT
 // ==============================================================================
 export default function Dashboard() {
   const [huidigeData, setHuidigeData] = useState<FabriekStatus>(nepData);
   const [blokjePositie, setBlokjePositie] = useState<React.CSSProperties>(blokjePosities.magazijn_stelling);
   const [magazijnKraanPositie, setMagazijnKraanPositie] = useState<React.CSSProperties>(magazijnKraanPosities.thuis);
-  const [groteKraanRotatie, setGroteKraanRotatie] = useState<"LINKS"|"RECHTS"|"STIL">("STIL");
-  const [blokjeKleur, setBlokjeKleur] = useState<string>("#29AAE2");
+  const [groteKraanRotatie, setGroteKraanRotatie] = useState<KraanData['motorRotate']>("STIL");
+  const [blokjeKleur, setBlokjeKleur] = useState<string>(startKleur); 
 
   const [logs, setLogs] = useState<string[]>(["Dashboard geladen..."]);
   
@@ -392,18 +475,31 @@ export default function Dashboard() {
     let stapIndex = 0;
     
     const voerStapUit = () => {
+        if (stapIndex >= simulatieStappen.length) {
+            stapIndex = 0; 
+        }
+        
         const stap = simulatieStappen[stapIndex];
 
         setHuidigeData(stap.data);
-        setBlokjePositie(blokjePosities[stap.blokjeLocatie]);
-        setMagazijnKraanPositie(magazijnKraanPosities[stap.magazijnKraanLocatie]);
-        setGroteKraanRotatie(stap.groteKraanRotatie || "STIL");
-        setBlokjeKleur(stap.blokjeKleur || "#29AAE2");
         
-        setLogs(prev => [stap.log, ...prev].slice(0, 10));
+        // Update BLOKJE POSITIE: alleen als GEEN van de kranen het draagt (d.w.z. Cantilever STIL EN geen VacuumValve)
+        const isCarriedByMagazijn = stap.data.magazijn.motorCantilever !== 'STIL';
+        const isCarriedByGroteKraan = stap.data.kraan.vacuumValve;
+        
+        if (!isCarriedByMagazijn && !isCarriedByGroteKraan) {
+            setBlokjePositie(blokjePosities[stap.blokjeLocatie]);
+        }
+        
+        setMagazijnKraanPositie(magazijnKraanPosities[stap.magazijnKraanLocatie] || magazijnKraanPosities.thuis);
+        setGroteKraanRotatie(stap.groteKraanRotatie || "STIL");
+        
+        setBlokjeKleur(stap.blokjeKleur || blokjeKleur);
+        
+        setLogs(prev => [stap.log, ...prev].slice(0, 15)); 
 
-        const wachttijd = stap.duur || 2000;
-        stapIndex = (stapIndex + 1) % simulatieStappen.length;
+        const wachttijd = stap.duur || 1500; 
+        stapIndex = (stapIndex + 1);
         
         setTimeout(voerStapUit, wachttijd);
     };
@@ -412,10 +508,11 @@ export default function Dashboard() {
   }, []); 
 
   return (
-    <div className="p-5 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-5 text-kensan-white">Fabriek Overzicht</h1>
-      <div className="grid grid-cols-3 gap-5 dashboard-grid">
-        <div className="col-span-2">
+    <div className="p-5 max-w-7xl mx-auto min-h-screen bg-gray-900 font-sans">
+      <h1 className="text-4xl font-extrabold mb-8 text-white border-b border-gray-700 pb-3">Professionele Fabriekssimulatie</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Kolom 1: De Fabriek View */}
+        <div className="lg:col-span-2">
           <FactoryView 
             blokjePositionStyle={blokjePositie} 
             blokjeKleur={blokjeKleur}
@@ -424,7 +521,8 @@ export default function Dashboard() {
             data={huidigeData} 
           />
         </div>
-        <div className="col-span-1">
+        {/* Kolom 2: Status en Log */}
+        <div className="lg:col-span-1">
           <StatusPanel data={huidigeData} logs={logs} />
         </div>
       </div>
