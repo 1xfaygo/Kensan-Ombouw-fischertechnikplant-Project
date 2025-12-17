@@ -77,6 +77,12 @@ export const Login: React.FC = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isLoading) {
+      handleSubmit(e as any);
+    }
+  };
+
   return (
     <div className="kensan-login-container">
       <div className="kensan-login-theme-toggle">
@@ -119,6 +125,7 @@ export const Login: React.FC = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="your@kensan.nl"
                 className="kensan-login-input"
               />
@@ -138,6 +145,7 @@ export const Login: React.FC = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="••••••••"
                 className="kensan-login-input kensan-login-input-with-icon-right"
               />

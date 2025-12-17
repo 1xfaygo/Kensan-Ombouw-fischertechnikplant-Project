@@ -7,6 +7,16 @@
  * LAYOUT COMPONENTS
  */
 
+/* Theme-aware chart text color */
+:root {
+  --kensan-chart-text: #ffffff;
+}
+
+/* Light theme switches chart text to black */
+body.light, .light-theme, .kensan-container.light, [data-theme="light"] {
+  --kensan-chart-text: #000000;
+}
+
 .kensan-container {
   display: flex;
   min-height: 100vh;
@@ -21,6 +31,11 @@
   background-color: var(--color-kensan-gray);
   transition: background-color 0.4s ease;
 }
+
+.MuiChartsLegend-label{
+  color: var(--color-kensan-white) !important;
+}
+
 
 /* 
  * SIDEBAR
@@ -210,6 +225,7 @@
 /* 
  * MENU ITEMS
  */
+
 
 .kensan-menu {
   flex: 1;
