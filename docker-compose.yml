@@ -1,6 +1,0 @@
-name: "Kensan-project"
-services:
-  opcua:
-    build: ./opcua-server
-    ports:
-      - "4840:4840"
