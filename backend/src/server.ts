@@ -50,10 +50,15 @@ app.get('/test', (req: Request, res: Response) => {
 
 
 initDefaultUser();
-await opcuaController.connect()
 
-
+// Start Express server first
 app.listen(PORT, () => {
   console.log(`Kensan Auth Server running on http://localhost:${PORT}`);
   console.log(`Default login: admin@kensan.nl / admin123`);
+});
+
+// Try to connect to OPC UA in the background
+opcuaController.connect().catch((error) => {
+  console.error('Failed to connect to OPC UA server:', error.message);
+  console.log('Server will continue running with test data');
 });
