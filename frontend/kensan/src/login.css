@@ -1,0 +1,164 @@
+/* 
+ * KENSAN LOGIN PAGE
+ * Login-specific styling (shared components are in kensan.css)
+ */
+
+.kensan-login-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-kensan-gray);
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background-color 0.4s ease;
+}
+
+.kensan-login-theme-toggle {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 10;
+}
+
+.kensan-login-card {
+  background-color: var(--color-kensan-black);
+  border-radius: 10px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  transition: background-color 0.4s ease;
+}
+
+.kensan-login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.kensan-login-logo {
+  max-width: 250px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.kensan-login-subtitle {
+  color: var(--color-kensan-light_gray);
+  font-size: 0.95rem;
+  transition: color 0.4s ease;
+}
+
+.kensan-login-error {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  background-color: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kensan-login-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.kensan-login-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-kensan-white);
+  font-size: 0.9rem;
+  transition: color 0.4s ease;
+}
+
+.kensan-login-input-wrapper {
+  position: relative;
+}
+
+.kensan-login-input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-kensan-light_gray);
+  font-size: 20px;
+  pointer-events: none;
+  transition: color 0.4s ease;
+}
+
+.kensan-login-input-icon-right {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-kensan-light_gray);
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.4s ease;
+}
+
+.kensan-login-input-icon-right:hover {
+  color: var(--color-kensan-white);
+}
+
+.kensan-login-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  background-color: var(--color-kensan-gray);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: var(--color-kensan-white);
+  font-size: 1rem;
+  outline: none;
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+.kensan-login-input-with-icon-right {
+  padding-right: 3rem;
+}
+
+.kensan-login-input:focus {
+  border-color: var(--color-cyberdefense-orange);
+}
+
+.kensan-login-input::placeholder {
+  color: var(--color-kensan-light_gray);
+  opacity: 0.6;
+  transition: color 0.4s ease;
+}
+
+.kensan-login-button {
+  width: 100%;
+  padding: 0.875rem;
+  background-color: var(--color-cyberdefense-orange);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.4s ease, opacity 0.4s ease;
+}
+
+.kensan-login-button:hover:not(:disabled) {
+  background-color: var(--color-cyberdefense-dark_orange);
+}
+
+.kensan-login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
